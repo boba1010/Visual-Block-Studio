@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Visual_Block_Studio.Views.TextEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Visual_Block_Studio.Controls.CodeEditor"
+    xmlns:local="using:Visual_Block_Studio.Views">
+
+    <controls:CodeEditor 
+        IsTabStop="True"
+        x:Name="codeEditor"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        Background="Transparent"/>
+</Page>

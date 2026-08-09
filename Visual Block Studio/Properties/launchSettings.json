@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Visual Block Studio (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Visual Block Studio (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

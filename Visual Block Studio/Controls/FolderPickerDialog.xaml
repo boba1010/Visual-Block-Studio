@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="Visual_Block_Studio.Controls.FolderPickerDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Visual_Block_Studio.Controls"
+    Title="Select Folder"
+    CornerRadius="8">
+
+    <Grid ColumnSpacing="8">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- TOP TOOLBAR & ADDRESS BAR -->
+        <StackPanel 
+            Grid.ColumnSpan="2" 
+            Orientation="Horizontal" 
+            Spacing="8" 
+            Padding="0,0,0,12">
+            <!-- Navigation Buttons -->
+            <Button 
+                x:Name="BackButton" 
+                Content="&#xE0A6;" 
+                FontFamily="Segoe Fluent Icons" 
+                Click="BackButton_Click" 
+                ToolTipService.ToolTip="Back" 
+                Background="Transparent" 
+                BorderThickness="0" />
+            <Button 
+                x:Name="UpButton" 
+                Content="&#xE11C;" 
+                FontFamily="Segoe Fluent Icons" 
+                Click="UpButton_Click" 
+                ToolTipService.ToolTip="Up to parent folder" 
+                Background="Transparent"
+                BorderThickness="0" />
+
+            <!-- Breadcrumb Address Bar -->
+            <BreadcrumbBar 
+                x:Name="PathBreadcrumb" 
+                ItemClicked="PathBreadcrumb_ItemClicked" 
+                VerticalAlignment="Center" 
+                Margin="10,0,0,0" />
+        </StackPanel>
+
+        <!-- LEFT SIDEBAR (Drives) -->
+        <ListView 
+            Grid.Row="1" 
+            x:Name="SidebarListView" 
+            SelectionChanged="SidebarListView_SelectionChanged"
+            Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}" 
+            CornerRadius="8">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel 
+                        Orientation="Horizontal" 
+                        Spacing="10" 
+                        Padding="8,4">
+                        <FontIcon 
+                            Glyph="{Binding Icon}" 
+                            FontFamily="Segoe Fluent Icons" 
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}" />
+                        <TextBlock 
+                            Text="{Binding Name}" 
+                            VerticalAlignment="Center" 
+                            FontSize="13" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- MAIN FOLDER CONTENT AREA -->
+        <ScrollViewer 
+            Grid.Row="1" 
+            Grid.Column="1" 
+            Padding="5"
+            Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+            CornerRadius="8">
+            <GridView 
+                x:Name="FolderGridView" 
+                DoubleTapped="FolderGridView_DoubleTapped">
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel 
+                            Width="89" 
+                            Height="80" 
+                            Padding="8" 
+                            Spacing="4" 
+                            HorizontalAlignment="Center" 
+                            Background="Transparent">
+                            <FontIcon 
+                                Glyph="&#xED25;" 
+                                FontFamily="Segoe Fluent Icons" 
+                                FontSize="34" 
+                                Foreground="#E0A926" 
+                                HorizontalAlignment="Center" />
+                            <TextBlock 
+                                Text="{Binding}" 
+                                TextAlignment="Center" 
+                                TextTrimming="CharacterEllipsis" 
+                                MaxLines="2" 
+                                FontSize="12" 
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+        </ScrollViewer>
+
+        <StackPanel
+            Orientation="Horizontal"
+            Spacing="8"
+            Margin="0, 12, 0, 0"
+            Grid.Row="2"
+            Grid.ColumnSpan="2">
+            <Button 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                MinWidth="245"
+                Content="Select" 
+                Click="OnPrimaryButtonClick" />
+            <Button 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                MinWidth="245"
+                Content="Cancel" 
+                Click="OnCloseButtonClick" />
+        </StackPanel>
+    </Grid>
+</ContentDialog>

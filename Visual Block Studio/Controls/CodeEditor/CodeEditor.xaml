@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Visual_Block_Studio.Controls.CodeEditor.CodeEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Visual_Block_Studio.Controls.CodeEditor"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml">
+
+    <Grid>
+        <canvas:CanvasControl
+            x:Name="editor"
+            IsTabStop="False"
+            Draw="EditorCanvas_Draw"
+            ClearColor="Transparent"/>
+
+        <TextBox
+            x:Name="inputBox"
+            AcceptsReturn="True"
+            TextChanged="InputBox_TextChanged"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            BorderThickness="0"
+            Padding="0"
+            Opacity="0">
+            <TextBox.KeyboardAccelerators>
+                <KeyboardAccelerator
+                    Key="Left"
+                    Modifiers="Shift"
+                    Invoked="EditorKey_Invoked" />
+
+                <KeyboardAccelerator
+                    Key="Right"
+                    Modifiers="Shift"
+                    Invoked="EditorKey_Invoked" />
+
+                <KeyboardAccelerator
+                    Key="Up"
+                    Modifiers="Shift"
+                    Invoked="EditorKey_Invoked" />
+
+                <KeyboardAccelerator
+                    Key="Down"
+                    Modifiers="Shift"
+                    Invoked="EditorKey_Invoked" />
+
+                <KeyboardAccelerator 
+                    Key="Home"
+                    Modifiers="Shift" 
+                    Invoked="EditorKey_Invoked"/>
+                
+                <KeyboardAccelerator 
+                    Key="End"
+                    Modifiers="Shift"
+                    Invoked="EditorKey_Invoked"/>
+
+                <KeyboardAccelerator
+                    Key="A"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+                <KeyboardAccelerator
+                    Key="Z"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+                <KeyboardAccelerator
+                    Key="Y"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+                <KeyboardAccelerator
+                    Key="C"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+                <KeyboardAccelerator
+                    Key="V"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+                <KeyboardAccelerator
+                    Key="X"
+                    Modifiers="Control"
+                    Invoked="EditorKey_Invoked" />
+
+                <KeyboardAccelerator Key="Back" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Left" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Right" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Up" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Down" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Enter" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Delete" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="Home" Invoked="EditorKey_Invoked"/>
+                <KeyboardAccelerator Key="End" Invoked="EditorKey_Invoked"/>
+            </TextBox.KeyboardAccelerators>
+        </TextBox>
+    </Grid>
+</UserControl>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Visual_Block_Studio.Views.BlocksPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Visual_Block_Studio.Views"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml">
+
+    <Grid>
+        <canvas:CanvasControl
+            x:Name="blockCanvas"
+            Draw="BlockCanvas_Draw"
+            CreateResources="BlockCanvas_CreateResources"
+            PointerPressed="BlockCanvas_PointerPressed"
+            PointerMoved="BlockCanvas_PointerMoved"
+            PointerReleased="BlockCanvas_PointerReleased" />
+    </Grid>
+</Page>
