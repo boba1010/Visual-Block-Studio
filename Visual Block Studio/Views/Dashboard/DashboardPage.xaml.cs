@@ -1,8 +1,8 @@
-using Microsoft.UI.Xaml.Shapes;
 using System.Collections.ObjectModel;
 using Visual_Block_Studio.Controls;
 using Visual_Block_Studio.Models;
 using Visual_Block_Studio.Services;
+using Visual_Block_Studio.ViewModels.Shell;
 
 namespace Visual_Block_Studio.Views.Dashboard
 {
@@ -10,12 +10,14 @@ namespace Visual_Block_Studio.Views.Dashboard
     {
         public ObservableCollection<Recent> Recents { get; private set; } = [];
         public RecentsService RecentsService { get; set; }
+        public ShellViewModel ViewModel { get; set; }
 
         public DashboardPage()
         {
             InitializeComponent();
 
             RecentsService = App.Services.GetRequiredService<RecentsService>();
+            ViewModel = App.Services.GetRequiredService<ShellViewModel>();
 
             Loading += DashboardPage_Loading;
         }
@@ -24,6 +26,29 @@ namespace Visual_Block_Studio.Views.Dashboard
         {
             foreach (var item in RecentsService.Get())
                 Recents.Add(item);
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (e.Parameter != null && e.Parameter is string path)
+            {
+                if (!File.Exists(path))
+                {
+                    errorTeachingTip.Content = "This Project/Solution doesn't exist.";
+                    errorTeachingTip.IsOpen = true;
+                    return;
+                }
+
+                await ViewModel.Solution.LoadSolutionAsync(path);
+
+                App.WorkspaceWindow = new MainWindow();
+                App.WorkspaceWindow.Activate();
+
+                App.StartWorkspaceWindow?.Close();
+                App.StartWorkspaceWindow = null;
+            }
         }
 
         private void OnCreateProjectClick(object sender, RoutedEventArgs e)
@@ -59,9 +84,22 @@ namespace Visual_Block_Studio.Views.Dashboard
 
                 Recent? recent = Recents.FirstOrDefault(r => r.FilePath == filePath);
                 if (recent != null)
+                {
+                    recent.UpdatedAt = DateTime.Now;
                     RecentsService.Update(recent);
+                }
 
-                App.WorkspaceWindow = new MainWindow(filePath);
+                await ViewModel.Solution.LoadSolutionAsync(filePath);
+
+                RecentsService.Save(new()
+                {
+                    Name = ViewModel.Solution.SolutionName,
+                    UpdatedAt = DateTime.Now,
+                    FilePath = ViewModel.Solution.This.FilePath,
+                    Type = Enums.RecentType.Solution,
+                });
+
+                App.WorkspaceWindow = new MainWindow();
                 App.WorkspaceWindow.Activate();
 
                 App.StartWorkspaceWindow?.Close();
@@ -85,18 +123,36 @@ namespace Visual_Block_Studio.Views.Dashboard
             }
         }
 
-        private void OnOpenFolderClick(object sender, RoutedEventArgs e)
+        private async void OnOpenFolderClick(object sender, RoutedEventArgs e)
         {
         }
 
-        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ListView listView && listView.SelectedItem is Recent selectedItem)
             {
                 Recent recent = selectedItem;
+                if (!File.Exists(selectedItem.FilePath))
+                {
+                    errorTeachingTip.Content = "This Project/Solution doesn't exist.";
+                    errorTeachingTip.IsOpen = true;
+                    return;
+                }
+
+                selectedItem.UpdatedAt = DateTime.Now;
                 RecentsService.Update(recent);
 
-                App.WorkspaceWindow = new MainWindow(selectedItem.FilePath);
+                await ViewModel.Solution.LoadSolutionAsync(selectedItem.FilePath);
+
+                RecentsService.Save(new()
+                {
+                    Name = ViewModel.Solution.SolutionName,
+                    UpdatedAt = DateTime.Now,
+                    FilePath = ViewModel.Solution.This.FilePath,
+                    Type = Enums.RecentType.Solution,
+                });
+
+                App.WorkspaceWindow = new MainWindow();
                 App.WorkspaceWindow.Activate();
 
                 listView.SelectedItem = null;
@@ -118,14 +174,24 @@ namespace Visual_Block_Studio.Views.Dashboard
             }
         }
 
-        private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             if (args.ChosenSuggestion != null)
             {
                 var selectedItem = (Recent)args.ChosenSuggestion;
+                if (!File.Exists(selectedItem.FilePath))
+                {
+                    errorTeachingTip.Content = "This Project/Solution doesn't exist.";
+                    errorTeachingTip.IsOpen = true;
+                    return;
+                }
+
+                selectedItem.UpdatedAt = DateTime.Now;
                 RecentsService.Update(selectedItem);
 
-                App.WorkspaceWindow = new MainWindow(selectedItem.FilePath);
+                await ViewModel.Solution.LoadSolutionAsync(selectedItem.FilePath);
+
+                App.WorkspaceWindow = new MainWindow();
                 App.WorkspaceWindow.Activate();
 
                 App.StartWorkspaceWindow?.Close();

@@ -70,18 +70,17 @@ namespace Visual_Block_Studio
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             string[] commandLineArgs = Environment.GetCommandLineArgs();
 
             // Check if a file path was passed to the app via double-click
-            if (commandLineArgs.Length > 1 && File.Exists(commandLineArgs[1]))
+            if (commandLineArgs.Length > 1)
             {
                 string targetFile = commandLineArgs[1];
 
-                // Bypass the start window and open the main workspace window directly
-                WorkspaceWindow = new MainWindow(targetFile);
-                WorkspaceWindow.Activate();
+                StartWorkspaceWindow = new StartWorkspaceWindow(targetFile);
+                StartWorkspaceWindow.Activate();
             }
             else
             {

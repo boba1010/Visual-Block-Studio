@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Visual_Block_Studio.Models.Explorer;
 using Visual_Block_Studio.ViewModels.Shell;
 
@@ -8,14 +7,9 @@ public sealed partial class MainWindow : Window
 {
     public ShellViewModel ViewModel { get; set; }
 
-    private readonly string ProjectPath = "";
-
-    public MainWindow(string projectPath)
+    public MainWindow()
     {
         InitializeComponent();
-
-        if (!string.IsNullOrEmpty(projectPath))
-            ProjectPath = projectPath;
 
         ViewModel = App.Services.GetRequiredService<ShellViewModel>();
 
@@ -24,20 +18,7 @@ public sealed partial class MainWindow : Window
 
         SetTitleBar(titlebar);
         ExtendsContentIntoTitleBar = true;
-
-        if (Content is FrameworkElement element)
-        {
-            element.Loading += Element_Loading;
-        }
     }
-
-    private async void Element_Loading(FrameworkElement sender, object args)
-    {
-        sender.Loading -= Element_Loading;
-
-        await ViewModel.Solution.LoadSolutionAsync(ProjectPath);
-    }
-
     private void EditorTabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
     {
         if (args.Item is TabViewModel tabVm)

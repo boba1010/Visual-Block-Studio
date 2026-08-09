@@ -6,7 +6,7 @@ namespace Visual_Block_Studio.Windows
 {
     public sealed partial class StartWorkspaceWindow : Window
     {
-        public StartWorkspaceWindow()
+        public StartWorkspaceWindow(string? targetPath = null)
         {
             InitializeComponent();
 
@@ -19,7 +19,7 @@ namespace Visual_Block_Studio.Windows
 
             SetTitleBar(titlebar);
 
-            rootFrame.Navigate(typeof(DashboardPage));
+            rootFrame.Navigate(typeof(DashboardPage), targetPath);
 
             rootFrame.Navigated += RootFrame_Navigated;
         }

@@ -21,7 +21,7 @@ public partial class SolutionViewModel : ObservableObject
     private readonly SolutionManager SolutionManager;
 
     [ObservableProperty]
-    public partial Solution Solution { get; set; } = new();
+    public partial Solution This { get; set; } = new();
 
     [ObservableProperty]
     public partial string SolutionName { get; set; } = null!;
@@ -46,10 +46,10 @@ public partial class SolutionViewModel : ObservableObject
         // Wires the *initial* default Solution instance. Reassignments (from
         // Load/CreateSolution) are handled by OnSolutionChanging/OnSolutionChanged
         // below, since field initializers bypass the generated property setter.
-        Solution.Projects.CollectionChanged += Projects_CollectionChanged;
+        This.Projects.CollectionChanged += Projects_CollectionChanged;
     }
 
-    partial void OnSolutionChanging(Solution oldValue, Solution newValue)
+    partial void OnThisChanging(Solution oldValue, Solution newValue)
     {
         oldValue.Projects.CollectionChanged -= Projects_CollectionChanged;
 
@@ -57,7 +57,7 @@ public partial class SolutionViewModel : ObservableObject
             SolutionExplorer.RemoveProjectItem(project);
     }
 
-    partial void OnSolutionChanged(Solution value)
+    partial void OnThisChanged(Solution value)
     {
         value.Projects.CollectionChanged += Projects_CollectionChanged;
 
@@ -110,8 +110,8 @@ public partial class SolutionViewModel : ObservableObject
 
             var slnx = await Task.Run(() => SolutionManager.Load(path));
 
-            Solution = slnx;
-            SolutionName = Solution.FileName.Replace(".vbsslnx", "");
+            This = slnx;
+            SolutionName = This.FileName.Replace(".vbsslnx", "");
         }
         catch (Exception ex)
         {
@@ -130,7 +130,7 @@ public partial class SolutionViewModel : ObservableObject
     public async Task CreateSolutionAsync()
     {
         var slnx = await Task.Run(() => SolutionManager.CreateSolution(Request));
-        Solution = slnx;
+        This = slnx;
     }
 
     public async Task LoadFileAsync(ProjectFile file)

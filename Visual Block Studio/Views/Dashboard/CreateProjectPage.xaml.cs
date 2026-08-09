@@ -36,11 +36,13 @@ public sealed partial class CreateProjectPage : Page
             { 
                 Name = ViewModel.SolutionName,
                 UpdatedAt = DateTime.Now,
-                FilePath = ViewModel.Solution.FilePath,
+                FilePath = ViewModel.This.FilePath,
                 Type = Enums.RecentType.Solution,
             });
 
-            App.WorkspaceWindow = new MainWindow(ViewModel.Solution.FilePath);
+            await ViewModel.LoadSolutionAsync(ViewModel.This.FilePath);
+
+            App.WorkspaceWindow = new MainWindow();
             App.WorkspaceWindow.Activate();
 
             App.StartWorkspaceWindow?.Close();
