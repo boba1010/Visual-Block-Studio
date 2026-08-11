@@ -3,7 +3,7 @@
 public class WindowBlockDto : XamlBlockDto
 {
     private string _prefix;
-    private string _suffix;
+    private string _suffix = "</Window>";
 
     public WindowBlockDto()
     {
@@ -14,8 +14,6 @@ public class WindowBlockDto : XamlBlockDto
     {Prop("x")}
     {Prop("local")}
     {Prop("Title")}>";
-
-        _suffix = "</Window>";
     }
 
     public string BaseClass { get; set; } = null!;
@@ -42,8 +40,6 @@ public class WindowBlockDto : XamlBlockDto
         "x" => "xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"",
         "local" => $"xmlns:local=\"using:{Namespace}\"",
         "Title" => $"Title=\"{Title}\"",
-        _ => PropertyBlocks.FirstOrDefault(p => p.Property.Name == name)?.Property.Value is { } v
-            ? $"{name}=\"{v}\""
-            : ""
+        _ => PropertyBlocks.FirstOrDefault(p => p.Property.Name == name)?.Property.Value is { } v ? $"{name}=\"{v}\"" : ""
     };
 }

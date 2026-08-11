@@ -137,10 +137,15 @@ public class VBSProjectManager(XamlCodeBlockService xamlCodeService,
             BaseClass = request.ProjectName,
             WindowName = "MainWindow",
             Namespace = request.ProjectName,
-            Children = [new ButtonBlock { Position = new(80, 100), Size = new(140, 50) }],
             Position = new(50, 50),
-            Size = new(800, 600),
+            Size = new(800, 600)
         };
+
+        mainWindowBlock.Children.Add(new ButtonBlock
+        {
+            Position = new(80, 100),
+            Size = new(140, 50)
+        });
 
         var blockFilePath = Path.Combine(projDir, "MainWindow" + BlockFileExtension);
 

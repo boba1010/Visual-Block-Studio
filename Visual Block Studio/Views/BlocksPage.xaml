@@ -13,6 +13,7 @@
             CreateResources="BlockCanvas_CreateResources"
             PointerPressed="BlockCanvas_PointerPressed"
             PointerMoved="BlockCanvas_PointerMoved"
-            PointerReleased="BlockCanvas_PointerReleased" />
+            PointerReleased="BlockCanvas_PointerReleased" 
+            PointerWheelChanged="BlockCanvas_PointerWheelChanged" />
     </Grid>
 </Page>

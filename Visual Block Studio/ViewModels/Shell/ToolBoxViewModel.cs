@@ -60,7 +60,6 @@ public partial class ToolBoxViewModel : ObservableObject
             Glyph = "\uE737",
             Block = new WindowBlock
             {
-                Children = [],
                 BaseClass = "Window",
                 Namespace = "Hello",
                 WindowName = "Window",

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Numerics;
+using Visual_Block_Studio.Collections;
 using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.DTOs.Explorer;
 using Visual_Block_Studio.Models;
@@ -302,11 +303,25 @@ public static class XamlBlockMappers
         };
     }
 
-    public static List<XamlBlock> MapDtosToBlocks(this List<XamlBlockDto> dtos)
+    public static XamlBlockCollection MapDtosToBlocks(this List<XamlBlockDto> dtos, XamlBlock parent)
     {
-        return [.. dtos.Select(p => p.MapDtoToBlock())];
+        var children = new XamlBlockCollection(parent);
+
+        foreach (var dto in dtos)
+        {
+            var block = dto.MapDtoToBlock();
+            block.Parent = new()
+            {
+                BlockType = parent.GetType(),
+                Size = parent.Size,
+                Position = parent.Position
+            };
+            children.Add(block);
+        }
+
+        return children;
     }
-    public static List<XamlBlockDto> MapBlocksToDtos(this List<XamlBlock> blocks)
+    public static List<XamlBlockDto> MapBlocksToDtos(this XamlBlockCollection blocks)
     {
         return [.. blocks.Select(p => p.MapBlockToDto())];
     }
@@ -316,7 +331,7 @@ public static class WindowBlockMappers
 {
     public static WindowBlock MapDtoToBlock(this WindowBlockDto dto)
     {
-        return new()
+        var window = new WindowBlock()
         {
             BaseClass = dto.BaseClass,
             Namespace = dto.Namespace,
@@ -324,10 +339,13 @@ public static class WindowBlockMappers
             Suffix = dto.Suffix,
             WindowName = dto.WindowName,
             PropertyBlocks = dto.PropertyBlocks.MapDtosToBlocks(),
-            Children = dto.Children.MapDtosToBlocks(),
             Position = (Vector2)dto.Position,
             Size = (Vector2)dto.Size,
         };
+
+        window.Children = dto.Children.MapDtosToBlocks(window);
+
+        return window;
     }
     public static WindowBlockDto MapBlockToDto(this WindowBlock block)
     {
@@ -350,15 +368,28 @@ public static class ButtonBlockMappers
 {
     public static ButtonBlock MapDtoToBlock(this ButtonBlockDto dto)
     {
-        return new()
+        var btn = new ButtonBlock()
         {
             Prefix = dto.Prefix,
             Suffix = dto.Suffix,
             PropertyBlocks = dto.PropertyBlocks.MapDtosToBlocks(),
-            Children = dto.Children.MapDtosToBlocks(),
             Position = (Vector2)dto.Position,
             Size = (Vector2)dto.Size,
+            Parent = dto.Parent is null
+            ? null
+            : new ParentXamlBlock
+            {
+                BlockType = BlockTypes.Get(dto.Parent.BlockType),
+                Position = (Vector2)dto.Parent.Position,
+                Size = (Vector2)dto.Parent.Size
+            },
+            Content = dto.Content,
+            Name = dto.Name,
         };
+
+        btn.Children = dto.Children.MapDtosToBlocks(btn);
+
+        return btn;
     }
     public static ButtonBlockDto MapBlockToDto(this ButtonBlock block)
     {
@@ -370,6 +401,16 @@ public static class ButtonBlockMappers
             Children = block.Children.MapBlocksToDtos(),
             Position = (Vector2Dto)block.Position,
             Size = (Vector2Dto)block.Size,
+            Name = block.Name,
+            Content = block.Content,
+            Parent = block.Parent is null
+            ? null
+            : new ParentXamlBlockDto
+            {
+                BlockType = block.Parent.BlockType.Name,
+                Position = (Vector2Dto)block.Parent.Position,
+                Size = (Vector2Dto)block.Parent.Size
+            },
         };
     }
 }
@@ -381,7 +422,7 @@ public static class BlockMappers
         return dto switch
         {
             WindowBlockDto _dto => _dto.MapDtoToBlock(),
-            ButtonBlockDto _dto => dto.MapDtoToBlock(),
+            ButtonBlockDto _dto => _dto.MapDtoToBlock(),
             _ => throw new NotSupportedException()
         };
     }

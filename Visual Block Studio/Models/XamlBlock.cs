@@ -1,10 +1,18 @@
 ﻿using System.Text;
+using Visual_Block_Studio.Collections;
 
 namespace Visual_Block_Studio.Models;
 
 public abstract class XamlBlock : Block
 {
-    public List<XamlBlock> Children { get; set; } = [];
+    public ParentXamlBlock? Parent { get; set; }
+    public XamlBlockCollection Children { get; set; } = null!;
+
+    protected XamlBlock()
+    {
+        Children = new XamlBlockCollection(this);
+    }
+
     public abstract List<PropertyBlock> PropertyBlocks { get; set; }
 
     private string? _prefixOverride;

@@ -15,3 +15,4 @@ global using Windows.Foundation.Collections;
 global using Windows.ApplicationModel;
 global using Windows.ApplicationModel.Activation;
 global using Microsoft.Extensions.DependencyInjection;
+global using System.Threading.Tasks;
