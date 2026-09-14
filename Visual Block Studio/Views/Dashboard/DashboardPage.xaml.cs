@@ -144,14 +144,6 @@ namespace Visual_Block_Studio.Views.Dashboard
 
                 await ViewModel.Solution.LoadSolutionAsync(selectedItem.FilePath);
 
-                RecentsService.Save(new()
-                {
-                    Name = ViewModel.Solution.SolutionName,
-                    UpdatedAt = DateTime.Now,
-                    FilePath = ViewModel.Solution.This.FilePath,
-                    Type = Enums.RecentType.Solution,
-                });
-
                 App.WorkspaceWindow = new MainWindow();
                 App.WorkspaceWindow.Activate();
 

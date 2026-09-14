@@ -24,12 +24,12 @@ public static class SolutionDtoSlnxGenerator
 
         var solutionElement = new XElement("Solution");
 
-        foreach (var project in solution.Projects)
+        foreach (var projectPath in solution.Projects)
         {
-            if (string.IsNullOrWhiteSpace(project.FilePath))
+            if (string.IsNullOrWhiteSpace(projectPath))
                 continue; // skip malformed entries rather than fail the whole write
 
-            var relativePath = ToRelative(solutionDir, project.FilePath);
+            var relativePath = ToRelative(solutionDir, projectPath);
             solutionElement.Add(new XElement("Project", new XAttribute("Path", relativePath)));
         }
 

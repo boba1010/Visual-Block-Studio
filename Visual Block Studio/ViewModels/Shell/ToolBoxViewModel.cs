@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Visual_Block_Studio.Enums;
 using Visual_Block_Studio.Messages;
 using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.XamlBlocks;
 using Visual_Block_Studio.Views;
 
 namespace Visual_Block_Studio.ViewModels;

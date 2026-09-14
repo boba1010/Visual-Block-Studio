@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
+using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.Helpers;
-using Visual_Block_Studio.Json;
-using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Services;
 
@@ -11,7 +11,7 @@ public class XamlCodeBlockService
     {
         using var fileStream = File.OpenRead(filePath);
 
-        var doc = JsonSerializer.Deserialize(fileStream, VBSJsonContext.Default.VBlockDocumentDto);
+        var doc = JsonSerializer.Deserialize<VBlockDocumentDto>(fileStream);
 
         return doc is null ? throw new InvalidOperationException("Invalid block file.") : (XamlBlock)doc.Root.MapDtoToBlock();
     }
@@ -22,7 +22,7 @@ public class XamlCodeBlockService
         {
             using var fileStream = File.OpenRead(filePath);
 
-            var doc = JsonSerializer.Deserialize(fileStream, VBSJsonContext.Default.VBlockDocumentDto);
+            var doc = JsonSerializer.Deserialize<VBlockDocumentDto>(fileStream);
 
             if (doc is null)
             {
@@ -47,7 +47,7 @@ public class XamlCodeBlockService
         {
             using var fileStream = File.Create(filePath);
 
-            JsonSerializer.Serialize(fileStream, block.MapBlockToDto(), VBSJsonContext.Default.XamlBlockDto);
+            JsonSerializer.Serialize(fileStream, block.MapBlockToDto());
 
             return true;
         }

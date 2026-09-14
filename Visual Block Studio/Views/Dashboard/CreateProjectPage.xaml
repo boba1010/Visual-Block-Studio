@@ -7,16 +7,9 @@
     xmlns:controls="using:Visual_Block_Studio.Controls">
 
     <Page.Resources>
-        <!-- Official XAML / MS Developer Blue-Teal -->
         <SolidColorBrush x:Key="BrandColorXaml" Color="#007ACC" />
-
-        <!-- Official C++ ISO Blue -->
-        <SolidColorBrush x:Key="BrandColorCpp" Color="#00599C" />
-
-        <!-- Official Windows Blue -->
+        <SolidColorBrush x:Key="BrandColorCSharp" Color="#00FF00" />
         <SolidColorBrush x:Key="BrandColorWindows" Color="#0078D4" />
-
-        <!-- Official WinUI / Fluent Purple-Indigo -->
         <SolidColorBrush x:Key="BrandColorWinUI" Color="#5C2D91" />
     </Page.Resources>
     
@@ -29,10 +22,10 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <TextBlock Text="WinUI Blank App" FontSize="18" />
-            <controls:Badge Text="Xaml" Background="{StaticResource BrandColorXaml}" />
-            <controls:Badge Text="C++" Background="{StaticResource BrandColorCpp}" />
-            <controls:Badge Text="Windows" Background="{StaticResource BrandColorWindows}" />
-            <controls:Badge Text="WinUI" Background="{StaticResource BrandColorWinUI}" />
+            <controls:Badge Text="Xaml" Background="{StaticResource BrandColorXaml}" Foreground="White" />
+            <controls:Badge Text="Windows" Background="{StaticResource BrandColorWindows}" Foreground="White" />
+            <controls:Badge Text="WinUI" Background="{StaticResource BrandColorWinUI}" Foreground="White" />
+            <controls:Badge Text="C#" Background="Transparent" Foreground="{StaticResource BrandColorCSharp}" />
         </StackPanel>
 
         <StackPanel Spacing="10" Grid.Row="1">

@@ -6,5 +6,5 @@ public class SolutionDto
     public string FilePath { get; set; } = null!;
     public string SlnxFileName { get; set; } = null!;
     public string SlnxFilePath { get; set; } = null!;
-    public List<VBSProjectDto> Projects { get; set; } = [];
+    public List<string> Projects { get; set; } = null!;
 }

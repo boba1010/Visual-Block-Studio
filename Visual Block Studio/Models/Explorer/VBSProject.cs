@@ -24,7 +24,7 @@ public partial class VBSProject : ObservableObject
     [ObservableProperty]
     public partial string FilePath { get; set; } = null!;
 
-    public string FileIconGlyph => "C++";
+    public string FileIconGlyph => "C#";
 
     // For example 'Visual Block Studio.vbsproj.g.cs'
     [ObservableProperty]
@@ -37,10 +37,10 @@ public partial class VBSProject : ObservableObject
     public partial string GeneratedFileIconGlyph { get; set; } = null!;
 
     [ObservableProperty]
-    public partial string VcxProjFileName { get; set; } = null!;
+    public partial string CsProjFileName { get; set; } = null!;
 
     [ObservableProperty]
-    public partial string VcxProjFilePath { get; set; } = null!;
+    public partial string CsProjFilePath { get; set; } = null!;
 
     [ObservableProperty]
     public partial string VcxProjFileIconGlyph { get; set; } = null!;

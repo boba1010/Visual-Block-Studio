@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Helpers;
 

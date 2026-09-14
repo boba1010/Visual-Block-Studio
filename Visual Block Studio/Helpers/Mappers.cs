@@ -4,7 +4,9 @@ using Visual_Block_Studio.Collections;
 using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.DTOs.Explorer;
 using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.CodeBlocks;
 using Visual_Block_Studio.Models.Explorer;
+using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Helpers;
 
@@ -68,24 +70,13 @@ public static class RecentMappers
 
 public static class SolutionMappers
 {
-    public static Solution MapDtoToSlnx(this SolutionDto dto)
-    {
-        return new()
-        {
-            FileName = dto.FileName,
-            FilePath = dto.FilePath,
-            Projects = dto.Projects.MapDtosToProjects(),
-            SlnxFileName = dto.SlnxFileName,
-            SlnxFilePath = dto.SlnxFilePath,
-        };
-    }
     public static SolutionDto MapSlnxToDto(this Solution solution)
     {
         return new()
         {
             FileName = solution.FileName,
             FilePath = solution.FilePath,
-            Projects = solution.Projects.MapProjectsToDtos(),
+            Projects = [.. solution.Projects.Select(p => p.FilePath)],
             SlnxFilePath = solution.SlnxFilePath,
             SlnxFileName = solution.SlnxFileName,
         };
@@ -107,8 +98,8 @@ public static class VBSProjectMappers
             FilePath = dto.FilePath,
             GeneratedFileName = dto.GeneratedFileName,
             GeneratedFilePath = dto.GeneratedFilePath,
-            VcxProjFileName = dto.VcxProjFileName,
-            VcxProjFilePath = dto.VcxProjFilePath,
+            CsProjFileName = dto.CsProjFileName,
+            CsProjFilePath = dto.CsProjFilePath,
         };
     }
     public static VBSProjectDto MapProjToDto(this VBSProject project)
@@ -120,8 +111,8 @@ public static class VBSProjectMappers
             Name = project.Name,
             OutputPath = project.OutputPath,
             TargetArchitecture = project.TargetArchitecture,
-            VcxProjFilePath = project.VcxProjFilePath,
-            VcxProjFileName = project.VcxProjFileName,
+            CsProjFilePath = project.CsProjFilePath,
+            CsProjFileName = project.CsProjFileName,
             GeneratedFilePath = project.GeneratedFilePath,
             GeneratedFileName = project.GeneratedFileName,
             FilePath = project.FilePath,
@@ -188,8 +179,8 @@ public static class VBSProjectMappers
             TargetArchitecture = p.TargetArchitecture,
             FileName = p.FileName,
             FilePath = p.FilePath,
-            VcxProjFileName = p.VcxProjFileName,
-            VcxProjFilePath = p.VcxProjFilePath,
+            CsProjFileName = p.CsProjFileName,
+            CsProjFilePath = p.CsProjFilePath,
         })];
     }
     public static List<VBSProjectDto> MapProjectsToDtos(this ObservableCollection<VBSProject> projects)
@@ -206,8 +197,8 @@ public static class VBSProjectMappers
             TargetArchitecture = p.TargetArchitecture,
             FileName = p.FileName,
             FilePath = p.FilePath,
-            VcxProjFileName = p.VcxProjFileName,
-            VcxProjFilePath = p.VcxProjFilePath,
+            CsProjFileName = p.CsProjFileName,
+            CsProjFilePath = p.CsProjFilePath,
         })];
     }
     public static ObservableCollection<ProjectFile> MapDtosToFileItems(this List<ProjectFileDto> dtos)
@@ -282,6 +273,45 @@ public static class PropertyMappers
     }
 }
 
+public static class CodeBlockMappers
+{
+    public static CodeBlock MapDtoToBlock(this CodeBlockDto dto)
+    {
+        return dto switch
+        {
+            WindowCodeBlockDto _dto => _dto.MapDtoToBlock(),
+            //ButtonBlockDto _dto => _dto.MapDtoToBlock(),
+            _ => throw new NotSupportedException()
+        };
+    }
+    public static CodeBlockDto MapBlockToDto(this CodeBlock block)
+    {
+        return block switch
+        {
+            WindowCodeBlock _block => _block.MapBlockToDto(),
+            //ButtonBlock _block => _block.MapBlockToDto(),
+            _ => throw new NotSupportedException()
+        };
+    }
+
+    public static CodeBlockCollection MapDtosToBlocks(this List<CodeBlockDto> dtos, CodeBlock parent)
+    {
+        var children = new CodeBlockCollection(parent);
+
+        foreach (var dto in dtos)
+        {
+            var block = dto.MapDtoToBlock();
+            block.Parent = new()
+            {
+                BlockType = parent.GetType(),
+            };
+            children.Add(block);
+        }
+
+        return children;
+    }
+}
+
 public static class XamlBlockMappers
 {
     public static XamlBlock MapDtoToBlock(this XamlBlockDto dto)
@@ -313,8 +343,6 @@ public static class XamlBlockMappers
             block.Parent = new()
             {
                 BlockType = parent.GetType(),
-                Size = parent.Size,
-                Position = parent.Position
             };
             children.Add(block);
         }
@@ -362,6 +390,31 @@ public static class WindowBlockMappers
             Size = (Vector2Dto)block.Size,
         };
     }
+
+    public static WindowCodeBlock MapDtoToBlock(this WindowCodeBlockDto dto)
+    {
+        var window = new WindowCodeBlock()
+        {
+            Name = dto.Name,
+            Header = dto.Header,
+            Parent = (ParentCodeBlock)dto.Parent,
+            Position = (Vector2)dto.Position,
+            Size = (Vector2)dto.Size,
+        };
+
+        window.Members = dto.Members.MapDtosToBlocks(window);
+
+        return window;
+    }
+    public static WindowCodeBlockDto MapBlockToDto(this WindowCodeBlock block)
+    {
+        return new()
+        {
+            Parent = (ParentCodeBlockDto)block.Parent,
+            Position = (Vector2Dto)block.Position,
+            Size = (Vector2Dto)block.Size,
+        };
+    }
 }
 
 public static class ButtonBlockMappers
@@ -375,14 +428,7 @@ public static class ButtonBlockMappers
             PropertyBlocks = dto.PropertyBlocks.MapDtosToBlocks(),
             Position = (Vector2)dto.Position,
             Size = (Vector2)dto.Size,
-            Parent = dto.Parent is null
-            ? null
-            : new ParentXamlBlock
-            {
-                BlockType = BlockTypes.Get(dto.Parent.BlockType),
-                Position = (Vector2)dto.Parent.Position,
-                Size = (Vector2)dto.Parent.Size
-            },
+            Parent = dto.Parent is null ? null : new() { BlockType = BlockTypes.Get(dto.Parent.BlockType), },
             Content = dto.Content,
             Name = dto.Name,
         };
@@ -403,14 +449,7 @@ public static class ButtonBlockMappers
             Size = (Vector2Dto)block.Size,
             Name = block.Name,
             Content = block.Content,
-            Parent = block.Parent is null
-            ? null
-            : new ParentXamlBlockDto
-            {
-                BlockType = block.Parent.BlockType.Name,
-                Position = (Vector2Dto)block.Parent.Position,
-                Size = (Vector2Dto)block.Parent.Size
-            },
+            Parent = block.Parent is null ? null : new() { BlockType = block.Parent.BlockType.Name, },
         };
     }
 }
@@ -432,7 +471,8 @@ public static class BlockMappers
         {
             WindowBlock _block => _block.MapBlockToDto(),
             ButtonBlock _block => _block.MapBlockToDto(),
-            _ => throw new NotSupportedException()
+            WindowCodeBlock _block => _block.MapBlockToDto(),
+            _ => throw new NotSupportedException("Block not supported")
         };
     }
 

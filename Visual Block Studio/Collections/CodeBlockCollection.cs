@@ -1,15 +1,16 @@
-﻿using Visual_Block_Studio.Models.XamlBlocks;
+﻿using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.CodeBlocks;
 
 namespace Visual_Block_Studio.Collections;
 
-public sealed partial class XamlBlockCollection(XamlBlock parent) : List<XamlBlock>
+public sealed partial class CodeBlockCollection(CodeBlock parent) : List<CodeBlock>
 {
-    public new void Add(XamlBlock block)
+    public new void Add(CodeBlock block)
     {
         if (Contains(block))
             return;
 
-        block.Parent = new ParentXamlBlock
+        block.Parent = new ParentCodeBlock
         {
             BlockType = parent.GetType(),
         };
@@ -17,7 +18,7 @@ public sealed partial class XamlBlockCollection(XamlBlock parent) : List<XamlBlo
         base.Add(block);
     }
 
-    public new bool Remove(XamlBlock block)
+    public new bool Remove(CodeBlock block)
     {
         if (!base.Remove(block))
             return false;

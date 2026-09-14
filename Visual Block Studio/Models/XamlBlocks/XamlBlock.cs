@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Visual_Block_Studio.Collections;
 
-namespace Visual_Block_Studio.Models;
+namespace Visual_Block_Studio.Models.XamlBlocks;
 
 public abstract class XamlBlock : Block
 {

@@ -16,8 +16,8 @@ public class VBSProjectDto
     public string GeneratedFileName { get; set; } = null!;
     public string GeneratedFilePath { get; set; } = null!;
 
-    public string VcxProjFileName { get; set; } = null!;
-    public string VcxProjFilePath { get; set; } = null!;
+    public string CsProjFileName { get; set; } = null!;
+    public string CsProjFilePath { get; set; } = null!;
 
     public List<ProjectItemDto> LayoutFiles { get; set; } = [];
 }

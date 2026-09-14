@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Visual_Block_Studio.Editing;
 using Visual_Block_Studio.Messages;
-using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Models.XamlBlocks;
 using Visual_Block_Studio.Services;
 
 namespace Visual_Block_Studio.ViewModels;

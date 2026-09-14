@@ -2,9 +2,7 @@
 
 public enum ProjectFileType
 {
-    Cpp,
+    Cs,
     Xaml,
     Block,
-    Header,
-    Idl
 }

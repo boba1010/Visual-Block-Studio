@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.Helpers;
-using Visual_Block_Studio.Json;
 using Visual_Block_Studio.Models;
 
 namespace Visual_Block_Studio.Services;
@@ -9,6 +8,7 @@ namespace Visual_Block_Studio.Services;
 public sealed class RecentsService
 {
     private readonly string _filePath;
+    private readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
     public RecentsService()
     {
@@ -23,12 +23,18 @@ public sealed class RecentsService
     public void Update(Recent recent)
     {
         var recents = Get();
-        int index = recents.FindIndex(x => string.Equals(x.FilePath, recent.FilePath, StringComparison.OrdinalIgnoreCase));
-        if (index < 0) return;
-        recents[index] = recent;
+
+        for (int i = 0; i < recents.Count; i++)
+        {
+            if (recents[i].FilePath == recent.FilePath)
+            {
+                recents[i] = recent;
+                break;
+            }
+        }
 
         using var fs = File.Create(_filePath);
-        JsonSerializer.Serialize(fs, recents.MapItemsToDtos(), VBSJsonContext.Default.ListRecentDto);
+        JsonSerializer.Serialize(fs, recents.MapItemsToDtos(), Options);
     }
 
     public void Save(Recent recent)
@@ -38,7 +44,7 @@ public sealed class RecentsService
         recents.Add(recent);
 
         using var fs = File.Create(_filePath);
-        JsonSerializer.Serialize(fs, recents.MapItemsToDtos(), VBSJsonContext.Default.ListRecentDto);
+        JsonSerializer.Serialize(fs, recents.MapItemsToDtos(), Options);
     }
 
     public List<Recent> Get()
@@ -48,6 +54,6 @@ public sealed class RecentsService
 
         using var fs = File.OpenRead(_filePath);
 
-        return JsonSerializer.Deserialize(fs, VBSJsonContext.Default.ListRecentDto)?.MapDtosToItems() ?? [];
+        return JsonSerializer.Deserialize<List<RecentDto>>(fs)?.MapDtosToItems() ?? [];
     }
 }

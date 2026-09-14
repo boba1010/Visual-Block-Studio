@@ -1,4 +1,5 @@
-﻿using Visual_Block_Studio.Models;
+﻿using Visual_Block_Studio.Models.CodeBlocks;
+using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Helpers;
 
@@ -8,8 +9,10 @@ public static class BlockTypes
     {
         [nameof(WindowBlock)] = typeof(WindowBlock),
         [nameof(ButtonBlock)] = typeof(ButtonBlock),
+        [nameof(WindowCodeBlock)] = typeof(WindowCodeBlock),
+        [nameof(NamespaceBlock)] = typeof(NamespaceBlock),
     };
 
     public static Type Get(string name) => Types.TryGetValue(name, out var type) ? type : throw new InvalidOperationException(
-        $"Unknown XAML block type: {name}");
+        $"Unknown block type: {name}");
 }

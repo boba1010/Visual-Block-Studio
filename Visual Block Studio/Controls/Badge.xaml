@@ -20,7 +20,7 @@
             Text="{x:Bind Text, Mode=OneWay}" 
             FontSize="10" 
             FontWeight="Bold" 
-            Foreground="White" 
+            Foreground="{x:Bind Foreground, Mode=OneWay}" 
             VerticalAlignment="Center" 
             HorizontalAlignment="Center"/>
     </Border>

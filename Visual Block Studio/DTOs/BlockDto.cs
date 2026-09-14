@@ -6,6 +6,7 @@ namespace Visual_Block_Studio.DTOs;
 [JsonDerivedType(typeof(WindowBlockDto), "Window")]
 [JsonDerivedType(typeof(ButtonBlockDto), "Button")]
 [JsonDerivedType(typeof(PropertyBlockDto), "Property")]
+[JsonDerivedType(typeof(WindowCodeBlockDto), "WindowCode")]
 public abstract class BlockDto
 {
     public Vector2Dto Position { get; set; } = new(50, 50);

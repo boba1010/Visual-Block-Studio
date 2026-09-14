@@ -1,4 +1,4 @@
-﻿namespace Visual_Block_Studio.Models;
+﻿namespace Visual_Block_Studio.Models.XamlBlocks;
 
 public sealed class ButtonBlock : XamlBlock
 {

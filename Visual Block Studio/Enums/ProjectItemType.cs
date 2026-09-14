@@ -4,9 +4,7 @@ public enum ProjectItemType
 {
     Folder,
     FilesParent,
-    SingleCppFile,
+    SingleCsFile,
     SingleXamlFile,
-    SingleHeaderFile,
     SingleBlockFile,
-    SingleIdlFile
 }
