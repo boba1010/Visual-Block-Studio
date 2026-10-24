@@ -21,14 +21,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Controls\Badge.xaml" />
-    <None Remove="Controls\CodeEditor\CodeEditor.xaml" />
-    <None Remove="Controls\FilePickerDialog.xaml" />
-    <None Remove="Controls\FolderPickerDialog.xaml" />
-    <None Remove="Views\BlocksPage.xaml" />
+    <None Remove="Views\Controls\Badge.xaml" />
+    <None Remove="Views\Controls\CodeEditor\CodeEditor.xaml" />
+    <None Remove="Views\Controls\FilePickerDialog.xaml" />
+    <None Remove="Views\Controls\FolderPickerDialog.xaml" />
     <None Remove="Views\Dashboard\CreateProjectPage.xaml" />
     <None Remove="Views\Dashboard\DashboardPage.xaml" />
     <None Remove="Views\TextEditor.xaml" />
+    <None Remove="Views\XamlVisualEditor.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,8 +69,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+	<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\TextEditor.xaml">
@@ -78,22 +78,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\FolderPickerDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\FilePickerDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\Dashboard\CreateProjectPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\BlocksPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -108,18 +93,16 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\Badge.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Folder Include="Views\Controls\CodeEditor\Syntax\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\CodeEditor\CodeEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <ProjectReference Include="..\XamlBlocksCompiler\XamlBlocksCompiler.csproj" />
+    <ProjectReference Include="..\XamlPreviewer\XamlPreviewer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controls\CodeEditor\Syntax\" />
-    <Folder Include="Editing\UndoRedo\" />
+    <Page Update="Views\XamlVisualEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <!--

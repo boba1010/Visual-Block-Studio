@@ -22,9 +22,7 @@ public sealed partial class MainWindow : Window
     private void EditorTabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
     {
         if (args.Item is TabViewModel tabVm)
-        {
             ViewModel.Tabs.CloseTab(tabVm);
-        }
     }
 
     private void TabFrame_Loaded(object sender, RoutedEventArgs e)

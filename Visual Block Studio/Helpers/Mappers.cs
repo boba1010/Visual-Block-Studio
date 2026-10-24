@@ -1,12 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Numerics;
-using Visual_Block_Studio.Collections;
 using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.DTOs.Explorer;
 using Visual_Block_Studio.Models;
-using Visual_Block_Studio.Models.CodeBlocks;
 using Visual_Block_Studio.Models.Explorer;
-using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Helpers;
 
@@ -90,7 +87,6 @@ public static class VBSProjectMappers
         return new()
         {
             LayoutFiles = dto.LayoutFiles.MapDtosToItems(),
-            MemoryLimitBytes = dto.MemoryLimitBytes,
             Name = dto.Name,
             OutputPath = dto.OutputPath,
             TargetArchitecture = dto.TargetArchitecture,
@@ -107,7 +103,6 @@ public static class VBSProjectMappers
         return new()
         {
             LayoutFiles = project.LayoutFiles.MapItemsToDtos(),
-            MemoryLimitBytes = project.MemoryLimitBytes,
             Name = project.Name,
             OutputPath = project.OutputPath,
             TargetArchitecture = project.TargetArchitecture,
@@ -173,7 +168,6 @@ public static class VBSProjectMappers
             GeneratedFileName = p.GeneratedFileName,
             GeneratedFilePath = p.GeneratedFilePath,
             LayoutFiles = p.LayoutFiles.MapDtosToItems(),
-            MemoryLimitBytes = p.MemoryLimitBytes,
             Name = p.Name,
             OutputPath = p.OutputPath,
             TargetArchitecture = p.TargetArchitecture,
@@ -191,7 +185,6 @@ public static class VBSProjectMappers
             GeneratedFileName = p.GeneratedFileName,
             GeneratedFilePath = p.GeneratedFilePath,
             LayoutFiles = p.LayoutFiles.MapItemsToDtos(),
-            MemoryLimitBytes = p.MemoryLimitBytes,
             Name = p.Name,
             OutputPath = p.OutputPath,
             TargetArchitecture = p.TargetArchitecture,
@@ -220,268 +213,5 @@ public static class VBSProjectMappers
             FilePath = f.FilePath,
             Type = f.Type,
         })];
-    }
-}
-
-public static class PropertyBlockMappers
-{
-    public static PropertyBlock MapDtoToBlock(this PropertyBlockDto dto)
-    {
-        return new()
-        {
-            Property = dto.Property.MapDtoToProperty(),
-            Position = (Vector2)dto.Position,
-            Size = (Vector2)dto.Size,
-        };
-    }
-    public static PropertyBlockDto MapBlockToDto(this PropertyBlock block)
-    {
-        return new()
-        {
-            Property = block.Property.MapPropertyToDto(),
-            Position = (Vector2Dto)block.Position,
-            Size = (Vector2Dto)block.Size,
-        };
-    }
-    public static List<PropertyBlock> MapDtosToBlocks(this List<PropertyBlockDto> dtos)
-    {
-        return [.. dtos.Select(p => new PropertyBlock { Property = p.Property.MapDtoToProperty(), Position = (Vector2)p.Position, Size = (Vector2)p.Size })];
-    }
-    public static List<PropertyBlockDto> MapBlocksToDtos(this List<PropertyBlock> blocks)
-    {
-        return [.. blocks.Select(p => new PropertyBlockDto { Property = p.Property.MapPropertyToDto(), Position = (Vector2Dto)p.Position, Size = (Vector2Dto)p.Size })];
-    }
-}
-
-public static class PropertyMappers
-{
-    public static Property MapDtoToProperty(this PropertyDto dto)
-    {
-        return new()
-        {
-            Name = dto.Name,
-            Value = dto.Value
-        };
-    }
-    public static PropertyDto MapPropertyToDto(this Property property)
-    {
-        return new()
-        {
-            Name = property.Name,
-            Value = property.Value
-        };
-    }
-}
-
-public static class CodeBlockMappers
-{
-    public static CodeBlock MapDtoToBlock(this CodeBlockDto dto)
-    {
-        return dto switch
-        {
-            WindowCodeBlockDto _dto => _dto.MapDtoToBlock(),
-            //ButtonBlockDto _dto => _dto.MapDtoToBlock(),
-            _ => throw new NotSupportedException()
-        };
-    }
-    public static CodeBlockDto MapBlockToDto(this CodeBlock block)
-    {
-        return block switch
-        {
-            WindowCodeBlock _block => _block.MapBlockToDto(),
-            //ButtonBlock _block => _block.MapBlockToDto(),
-            _ => throw new NotSupportedException()
-        };
-    }
-
-    public static CodeBlockCollection MapDtosToBlocks(this List<CodeBlockDto> dtos, CodeBlock parent)
-    {
-        var children = new CodeBlockCollection(parent);
-
-        foreach (var dto in dtos)
-        {
-            var block = dto.MapDtoToBlock();
-            block.Parent = new()
-            {
-                BlockType = parent.GetType(),
-            };
-            children.Add(block);
-        }
-
-        return children;
-    }
-}
-
-public static class XamlBlockMappers
-{
-    public static XamlBlock MapDtoToBlock(this XamlBlockDto dto)
-    {
-        return dto switch
-        {
-            WindowBlockDto _dto => _dto.MapDtoToBlock(),
-            ButtonBlockDto _dto => _dto.MapDtoToBlock(),
-            _ => throw new NotSupportedException()
-        };
-    }
-    public static XamlBlockDto MapBlockToDto(this XamlBlock block)
-    {
-        return block switch
-        {
-            WindowBlock _block => _block.MapBlockToDto(),
-            ButtonBlock _block => _block.MapBlockToDto(),
-            _ => throw new NotSupportedException()
-        };
-    }
-
-    public static XamlBlockCollection MapDtosToBlocks(this List<XamlBlockDto> dtos, XamlBlock parent)
-    {
-        var children = new XamlBlockCollection(parent);
-
-        foreach (var dto in dtos)
-        {
-            var block = dto.MapDtoToBlock();
-            block.Parent = new()
-            {
-                BlockType = parent.GetType(),
-            };
-            children.Add(block);
-        }
-
-        return children;
-    }
-    public static List<XamlBlockDto> MapBlocksToDtos(this XamlBlockCollection blocks)
-    {
-        return [.. blocks.Select(p => p.MapBlockToDto())];
-    }
-}
-
-public static class WindowBlockMappers
-{
-    public static WindowBlock MapDtoToBlock(this WindowBlockDto dto)
-    {
-        var window = new WindowBlock()
-        {
-            BaseClass = dto.BaseClass,
-            Namespace = dto.Namespace,
-            Prefix = dto.Prefix,
-            Suffix = dto.Suffix,
-            WindowName = dto.WindowName,
-            PropertyBlocks = dto.PropertyBlocks.MapDtosToBlocks(),
-            Position = (Vector2)dto.Position,
-            Size = (Vector2)dto.Size,
-        };
-
-        window.Children = dto.Children.MapDtosToBlocks(window);
-
-        return window;
-    }
-    public static WindowBlockDto MapBlockToDto(this WindowBlock block)
-    {
-        return new()
-        {
-            BaseClass = block.BaseClass,
-            Namespace = block.Namespace,
-            Prefix = block.Prefix,
-            Suffix = block.Suffix,
-            WindowName = block.WindowName,
-            PropertyBlocks = block.PropertyBlocks.MapBlocksToDtos(),
-            Children = block.Children.MapBlocksToDtos(),
-            Position = (Vector2Dto)block.Position,
-            Size = (Vector2Dto)block.Size,
-        };
-    }
-
-    public static WindowCodeBlock MapDtoToBlock(this WindowCodeBlockDto dto)
-    {
-        var window = new WindowCodeBlock()
-        {
-            Name = dto.Name,
-            Header = dto.Header,
-            Parent = (ParentCodeBlock)dto.Parent,
-            Position = (Vector2)dto.Position,
-            Size = (Vector2)dto.Size,
-        };
-
-        window.Members = dto.Members.MapDtosToBlocks(window);
-
-        return window;
-    }
-    public static WindowCodeBlockDto MapBlockToDto(this WindowCodeBlock block)
-    {
-        return new()
-        {
-            Parent = (ParentCodeBlockDto)block.Parent,
-            Position = (Vector2Dto)block.Position,
-            Size = (Vector2Dto)block.Size,
-        };
-    }
-}
-
-public static class ButtonBlockMappers
-{
-    public static ButtonBlock MapDtoToBlock(this ButtonBlockDto dto)
-    {
-        var btn = new ButtonBlock()
-        {
-            Prefix = dto.Prefix,
-            Suffix = dto.Suffix,
-            PropertyBlocks = dto.PropertyBlocks.MapDtosToBlocks(),
-            Position = (Vector2)dto.Position,
-            Size = (Vector2)dto.Size,
-            Parent = dto.Parent is null ? null : new() { BlockType = BlockTypes.Get(dto.Parent.BlockType), },
-            Content = dto.Content,
-            Name = dto.Name,
-        };
-
-        btn.Children = dto.Children.MapDtosToBlocks(btn);
-
-        return btn;
-    }
-    public static ButtonBlockDto MapBlockToDto(this ButtonBlock block)
-    {
-        return new()
-        {
-            Prefix = block.Prefix,
-            Suffix = block.Suffix,
-            PropertyBlocks = block.PropertyBlocks.MapBlocksToDtos(),
-            Children = block.Children.MapBlocksToDtos(),
-            Position = (Vector2Dto)block.Position,
-            Size = (Vector2Dto)block.Size,
-            Name = block.Name,
-            Content = block.Content,
-            Parent = block.Parent is null ? null : new() { BlockType = block.Parent.BlockType.Name, },
-        };
-    }
-}
-
-public static class BlockMappers
-{
-    public static Block MapDtoToBlock(this BlockDto dto)
-    {
-        return dto switch
-        {
-            WindowBlockDto _dto => _dto.MapDtoToBlock(),
-            ButtonBlockDto _dto => _dto.MapDtoToBlock(),
-            _ => throw new NotSupportedException()
-        };
-    }
-    public static BlockDto MapBlockToDto(this Block block)
-    {
-        return block switch
-        {
-            WindowBlock _block => _block.MapBlockToDto(),
-            ButtonBlock _block => _block.MapBlockToDto(),
-            WindowCodeBlock _block => _block.MapBlockToDto(),
-            _ => throw new NotSupportedException("Block not supported")
-        };
-    }
-
-    public static List<Block> MapDtosToBlocks(this List<BlockDto> dtos)
-    {
-        return [.. dtos.Select(p => p.MapDtoToBlock())];
-    }
-    public static List<BlockDto> MapBlocksToDtos(this List<Block> blocks)
-    {
-        return [.. blocks.Select(p => p.MapBlockToDto())];
     }
 }

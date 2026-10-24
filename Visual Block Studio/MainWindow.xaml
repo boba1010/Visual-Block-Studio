@@ -7,7 +7,7 @@
     xmlns:models="using:Visual_Block_Studio.Models"
     xmlns:viewmodels="using:Visual_Block_Studio.ViewModels.Shell"
     Title="Visual Block Studio">
-    
+
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
@@ -18,7 +18,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -39,7 +39,7 @@
                     <StackPanel Padding="10" Orientation="Horizontal">
                         <TextBlock Text="VBS" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-                        <Border Margin="20, 0, 0, 0" Width="1" Background="Gray" />                        
+                        <Border Margin="20, 0, 0, 0" Width="1" Background="Gray" />
                     </StackPanel>
 
                     <CommandBar IsTabStop="False" Grid.Column="1" DefaultLabelPosition="Right" Background="Transparent">
@@ -80,6 +80,7 @@
                         <AppBarSeparator />
 
                         <AppBarButton 
+                            Visibility="Collapsed"
                             IsTabStop="False" Width="90" Label="Debug" 
                             ToolTipService.ToolTip="Select which mode you want to compile your app in">
                             <AppBarButton.Icon>
@@ -95,7 +96,7 @@
 
                         <AppBarButton 
                             IsTabStop="False" Width="150" 
-                            Label="CPU Architecture"
+                            Label="CPU Architecture" Visibility="Collapsed"
                             ToolTipService.ToolTip="Select the CPU architecture">
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xEEA1;"/>
@@ -110,7 +111,7 @@
                         </AppBarButton>
 
                         <AppBarButton 
-                            IsTabStop="False" MinWidth="150"
+                            IsTabStop="False" MinWidth="150" Visibility="Collapsed"
                             Label="Visual blocks studio (Unpackaged)"
                             ToolTipService.ToolTip="Run with debugger attached">
                             <AppBarButton.Icon>
@@ -128,7 +129,7 @@
                             IsTabStop="False"
                             LabelPosition="Collapsed"
                             Width="40"
-                            ToolTipService.ToolTip="Run with debugger attached">
+                            ToolTipService.ToolTip="Run without debugging">
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xE768;"/>
                             </AppBarButton.Icon>
@@ -138,7 +139,7 @@
             </TitleBar.LeftHeader>
         </TitleBar>
 
-        
+
 
         <NavigationView
             IsTabStop="False"
@@ -168,19 +169,8 @@
                         <Run Text="'" />
                     </TextBlock>
                 </NavigationViewItem>
-                
-                <NavigationViewItem 
-                    IsTabStop="False"
-                    Content="ToolBox"
-                    IsExpanded="True"
-                    SelectsOnInvoked="False"
-                    MenuItemsSource="{x:Bind ViewModel.ToolBox.ToolBoxExplorer.ToolBoxMenuItems, Mode=OneWay}">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE90F;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
-            
+
             <NavigationView 
                 IsTabStop="False"
                 PaneTitle="Block Properties"
@@ -217,7 +207,7 @@
                 </TabView>
             </NavigationView>
         </NavigationView>
-        
+
 
         <TeachingTip 
             Grid.Row="2"
@@ -234,7 +224,7 @@
                         FontFamily="{ThemeResource SymbolThemeFontFamily}" 
                         Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
             </TeachingTip.IconSource>
-            
+
             <TextBlock x:Name="ErrorDetailsText" TextWrapping="Wrap" MaxWidth="300"/>
         </TeachingTip>
     </Grid>

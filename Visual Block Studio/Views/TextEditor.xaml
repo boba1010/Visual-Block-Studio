@@ -3,7 +3,7 @@
     x:Class="Visual_Block_Studio.Views.TextEditor"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Visual_Block_Studio.Controls.CodeEditor"
+    xmlns:controls="using:Visual_Block_Studio.Views.Controls.CodeEditor"
     xmlns:local="using:Visual_Block_Studio.Views">
 
     <controls:CodeEditor 

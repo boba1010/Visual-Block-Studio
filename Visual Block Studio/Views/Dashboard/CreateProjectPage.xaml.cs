@@ -1,7 +1,6 @@
-using Visual_Block_Studio.Controls;
-using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.Services;
 using Visual_Block_Studio.ViewModels.Shell;
+using Visual_Block_Studio.Views.Controls;
 
 namespace Visual_Block_Studio.Views.Dashboard;
 

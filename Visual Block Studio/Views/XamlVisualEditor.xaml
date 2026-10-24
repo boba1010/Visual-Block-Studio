@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Visual_Block_Studio.Views.XamlVisualEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Visual_Block_Studio.Views">
+
+    <Grid Background="#FF202020" Padding="10" ColumnSpacing="10" RowSpacing="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="350" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="10">
+            <ToggleButton
+                x:Name="InteractiveModeToggle"
+                Content="Interactive Mode"
+                Checked="InteractiveModeToggle_Changed"
+                Unchecked="InteractiveModeToggle_Changed" />
+
+            <ToggleButton
+                x:Name="PropertiesToggle"
+                IsChecked="True"
+                Content="Open Props" 
+                Checked="PropertiesToggle_Changed"
+                Unchecked="PropertiesToggle_Changed" />
+
+            <Button 
+                x:Name="FullScreenPreview"
+                Content="FullScreen Preview"
+                Click="FullScreenPreview_Click"/>
+        </StackPanel>
+        
+        <!-- Toolbox -->
+        <StackPanel 
+            Padding="12"
+            Grid.Column="0" Grid.Row="1"
+            CornerRadius="12" Spacing="8"
+            Background="#FF282828">
+
+            <TextBlock 
+                Text="Controls"
+                FontSize="18"
+                FontWeight="SemiBold"
+                HorizontalAlignment="Center" />
+
+            <Button 
+                Content="Button"
+                Click="AddButton_Click" />
+
+            <Button 
+                Content="TextBlock"
+                Click="AddTextBlock_Click" />
+
+            <Button
+                Content="Grid"
+                Click="AddGrid_Click" />
+        </StackPanel>
+
+        <ScrollViewer
+            x:Name="DesignScroll"
+            Grid.Column="1" Grid.Row="1"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto"
+            ZoomMode="Disabled">
+
+            <Grid
+                x:Name="DesignViewport"
+                MinWidth="1000" MinHeight="700"
+                CornerRadius="12"
+                Background="#FF303030">
+
+                <!-- Native control previews -->
+                <Grid
+                    x:Name="PreviewSurface"
+                    IsHitTestVisible="False"/>
+
+                <!-- Designer input -->
+                <Canvas
+                    x:Name="DesignSurface"
+                    Background="Transparent" />
+
+                <!-- Selection outline -->
+                <Canvas
+                    x:Name="SelectionOverlay"
+                    IsHitTestVisible="False" />
+
+            </Grid>
+        </ScrollViewer>
+
+        <Grid 
+            Padding="12" x:Name="PropertiesView"
+            Grid.Column="2" Grid.Row="1"
+            CornerRadius="12" RowSpacing="12"
+            Background="#FF282828" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Grid.Row="0" FontSize="20" Text="Properties"
+                HorizontalAlignment="Center" />
+
+            <ScrollViewer
+                Grid.Row="1"
+                VerticalScrollBarVisibility="Visible"
+                HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel
+                    x:Name="PropertiesContainer"
+                    Spacing="12" />
+
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

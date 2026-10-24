@@ -71,12 +71,12 @@ public partial class SolutionViewModel : ObservableObject
         }
     }
 
-    private void OpenBlocksTab(ProjectFile file)
+    private void OpenXamlVisualEditorTab(ProjectFile file)
     {
         WeakReferenceMessenger.Default.Send(new OpenTabRequestMessage(new OpenTabRequestArgs
         {
             Title = file.FileName,
-            TargetPageType = typeof(BlocksPage),
+            TargetPageType = typeof(XamlVisualEditor),
             Parameter = file.FilePath
         }));
     }
@@ -127,7 +127,7 @@ public partial class SolutionViewModel : ObservableObject
     public async Task LoadFileAsync(ProjectFile file)
     {
         if (file.Type == Enums.ProjectFileType.Block)
-            OpenBlocksTab(file);
+            OpenXamlVisualEditorTab(file);
         else
             OpenTextEditorTab(file);
     }

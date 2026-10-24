@@ -4,10 +4,20 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Visual Block Studio/Visual Block Studio.csproj" Id="e2e0138a-4f70-451f-b7c9-3d3cb815985c">
-    <Platform Solution="*|ARM64" Project="ARM64" />
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-    <Deploy />
-  </Project>
+  <Folder Name="/SourceGen/">
+    <Project Path="D:/My Programs/Visual Block Studio/XamlBlocksCompiler.SourceGeneration/XamlBlocksCompiler.SourceGeneration.csproj" Id="06eac0e5-13ad-4d91-bf6e-db84082ac386" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="D:/My Programs/Visual Block Studio/Visual Block Studio/Visual Block Studio.csproj" Id="e2e0138a-4f70-451f-b7c9-3d3cb815985c">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
+      <Deploy />
+    </Project>
+    <Project Path="D:/My Programs/Visual Block Studio/XamlBlocksCompiler/XamlBlocksCompiler.csproj" Id="28066db4-a0b4-4ad3-924b-89e688f47bba" />
+    <Project Path="XamlPreviewer/XamlPreviewer.csproj" Id="758d37ab-a2d4-4edf-b07f-f4b4729c71ef" />
+  </Folder>
+  <Folder Name="/testing/">
+    <Project Path="D:/My Programs/Visual Block Studio/VBS.Test/VBS.Test.csproj" Id="55cbcd87-7779-419b-aa9b-2549e690fe6f" />
+  </Folder>
 </Solution>

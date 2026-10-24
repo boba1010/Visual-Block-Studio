@@ -5,7 +5,6 @@ using Visual_Block_Studio.DTOs;
 using Visual_Block_Studio.DTOs.Explorer;
 using Visual_Block_Studio.Helpers;
 using Visual_Block_Studio.Models.Explorer;
-using Visual_Block_Studio.Models.XamlBlocks;
 
 namespace Visual_Block_Studio.Services;
 
@@ -112,7 +111,6 @@ public class VBSProjectManager(TemplateProjectService templateService)
         sb.AppendLine("{");
         sb.AppendLine($"    public const string Name = \"{Escape(dto.Name)}\";");
         sb.AppendLine($"    public const string TargetArchitecture = \"{Escape(dto.TargetArchitecture)}\";");
-        sb.AppendLine($"    public const uint MemoryLimitBytes = {dto.MemoryLimitBytes};");
         sb.AppendLine($"    public const string OutputPath = \"{Escape(dto.OutputPath)}\";");
         sb.AppendLine($"    public const string FileName = \"{Escape(dto.FileName)}\";");
         sb.AppendLine($"    public const string FilePath = \"{Escape(dto.FilePath)}\";");
@@ -188,17 +186,15 @@ public class VBSProjectManager(TemplateProjectService templateService)
 
     private static string Escape(string value) => value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
-    public XamlBlock LoadBlockFile(ProjectFileDto file)
+    public object LoadBlockFile(ProjectFileDto file)
     {
         using var fs = File.OpenRead(file.FilePath);
 
         var document = JsonSerializer.Deserialize<VBlockDocumentDto>(fs);
 
         if (document?.Root is null)
-        {
             throw new InvalidOperationException($"Invalid block file '{file.FilePath}'.");
-        }
 
-        return (XamlBlock)document.Root.MapDtoToBlock();
+        return document.Root;
     }
 }

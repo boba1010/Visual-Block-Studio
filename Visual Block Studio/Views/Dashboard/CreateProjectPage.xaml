@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Visual_Block_Studio.Views.Dashboard"
-    xmlns:controls="using:Visual_Block_Studio.Controls">
+    xmlns:controls="using:Visual_Block_Studio.Views.Controls">
 
     <Page.Resources>
         <SolidColorBrush x:Key="BrandColorXaml" Color="#007ACC" />

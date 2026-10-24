@@ -4,7 +4,6 @@ public class VBSProjectDto
 {
     public string Name { get; set; } = null!;
     public string TargetArchitecture { get; set; } = null!;
-    public uint MemoryLimitBytes { get; set; }
 
     public string OutputPath { get; set; } = null!;
 

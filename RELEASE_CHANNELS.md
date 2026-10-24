@@ -124,7 +124,7 @@ Expect:
 | 🔬 Alpha        | Low       | High        |
 | 🧩 Beta         | Medium    | Medium      |
 | 👀 Preview      | High      | Low         |
-| ✅ Stable        | Highest   | Maintenance |
+| ✅ Stable       | Highest   | Maintenance |
 
 ## 🔄 Release Progression
 

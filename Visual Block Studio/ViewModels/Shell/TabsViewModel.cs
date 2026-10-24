@@ -11,7 +11,7 @@ public partial class TabViewModel(string header, System.Type targetPageType, obj
     [ObservableProperty]
     public partial string TabHeader { get; set; } = header;
 
-    public System.Type TargetPageType { get; } = targetPageType ?? typeof(BlocksPage);
+    public System.Type TargetPageType { get; } = targetPageType ?? typeof(TextEditor);
     public object NavigationParameter { get; } = navParams;
 }
 
