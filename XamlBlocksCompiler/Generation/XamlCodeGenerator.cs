@@ -74,12 +74,7 @@ public sealed class XamlCodeGenerator
                 if (content.Content is XamlElementSyntax or XamlPropertySyntax)
                     WriteNode(writer, content.Content);
                 else
-                {
-                    writer.WriteAttributeString(
-                        "Content", 
-                        Convert.ToString(content.Content, CultureInfo.InvariantCulture)
-                    );
-                }
+                    writer.WriteAttributeString("Content", Convert.ToString(content.Content, CultureInfo.InvariantCulture));
                 break;
         }
 
@@ -88,16 +83,8 @@ public sealed class XamlCodeGenerator
 
     private static void WriteGeneratedAttributes(XmlWriter writer, XamlElementSyntax element)
     {
-        switch (element)
-        {
-            case XamlButtonSyntax button:
-                XamlButtonSyntaxXamlMetadata.WriteAttributes(writer, button);
-                break;
-
-            case XamlGridSyntax grid:
-                XamlGridSyntaxXamlMetadata.WriteAttributes(writer, grid);
-                break;
-        }
+        if (!GeneratedXamlControlRegistry.WriteAttributes(writer, element))
+            throw new NotSupportedException($"No metadata registered for {element.GetType().Name}");
     }
 
     private static void WriteProperty(XmlWriter writer, XamlPropertySyntax property)

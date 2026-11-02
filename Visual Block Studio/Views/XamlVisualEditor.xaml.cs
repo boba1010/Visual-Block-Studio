@@ -1,7 +1,10 @@
 using Visual_Block_Studio.Designer;
 using Visual_Block_Studio.Designer.Properties;
 using Visual_Block_Studio.Designer.Selection;
+using Windows.ApplicationModel.DataTransfer;
+using XamlBlocksCompiler.Generation;
 using XamlBlocksCompiler.Syntax;
+using XamlBlocksCompiler.Syntax.Controls;
 
 namespace Visual_Block_Studio.Views;
 
@@ -92,7 +95,7 @@ public sealed partial class XamlVisualEditor : Page
 
     private void AddTextBlock_Click(object sender, RoutedEventArgs e)
     {
-        var (element, syntax) = XamlElementFactory.CreateTextBox();
+        var (element, syntax) = XamlElementFactory.CreateTextBlock();
         AddControl(element, syntax);
     }
 
@@ -105,13 +108,19 @@ public sealed partial class XamlVisualEditor : Page
     private void AddControl(FrameworkElement element, XamlElementSyntax syntax)
     {
         if (PreviewSurface.Children.Count == 0)
+        {
             PreviewSurface.Children.Add(element);
-        else if (_selection.SelectedElement is Panel panel)
+            _document.RootSyntax = syntax;
+        }
+        else if (_selection.SelectedElement is Panel panel && _document.RootSyntax is XamlPanelSyntax panelSyntax)
+        {
             panel.Children.Add(element);
+            panelSyntax.Children.Add(syntax);
+        }
         else
             return;
 
-        _document.AddSyntax(element, syntax);
+        _document.AddSyntaxRelation(element, syntax);
 
         element.SizeChanged += Control_SizeChanged;
 
@@ -145,6 +154,20 @@ public sealed partial class XamlVisualEditor : Page
         if (_document.RootSyntax is not { } rootSyntax)
             return;
 
-        _preview.Show(rootSyntax);
+        _preview.Show((XamlControlSyntax)rootSyntax);
+    }
+
+    private void GenerateXaml_Click(object sender, RoutedEventArgs e)
+    {
+        if (_document.RootSyntax is null)
+            return;
+
+        var generator = new XamlCodeGenerator();
+        string xaml = generator.Generate(_document.RootSyntax);
+
+        var package = new DataPackage();
+        package.SetText(xaml);
+
+        Clipboard.SetContent(package);
     }
 }

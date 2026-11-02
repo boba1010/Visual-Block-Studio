@@ -14,25 +14,14 @@ public static class XamlPreviewer
 {
     public static object? Load(XamlElementSyntax element)
     {
-        if (element is XamlWindowSyntax windowSyntax)
+        if (element is XamlPanelSyntax panel)
         {
-            Window window = new()
+            switch (panel)
             {
-                Title = windowSyntax.Title,
-            };
-
-            if (windowSyntax.Content is XamlPanelSyntax panel)
-            {
-                switch (panel)
-                {
-                    case XamlGridSyntax gridSyntax:
-                        var grid = CreateGrid(gridSyntax);
-                        window.Content = grid;
-                        break;
-                }
+                case XamlGridSyntax gridSyntax:
+                    var grid = CreateGrid(gridSyntax);
+                    return grid;
             }
-
-            return window;
         }
 
         return null;
@@ -81,12 +70,31 @@ public static class XamlPreviewer
         return button;
     }
 
+    private static TextBlock CreateTextBlock(XamlTextBlockSyntax syntax)
+    {
+        var bgc = syntax.Foreground;
+
+        var textBlock = new TextBlock
+        {
+            Width = syntax.Width,
+            Height = syntax.Height,
+            Foreground = new SolidColorBrush(ColorHelper.FromArgb(bgc.A, bgc.R, bgc.G, bgc.B)),
+            FontSize = syntax.FontSize,
+            HorizontalAlignment = (HorizontalAlignment)syntax.HorizontalAlignment,
+            VerticalAlignment = (VerticalAlignment)syntax.VerticalAlignment,
+            Text = syntax.Text
+        };
+
+        return textBlock;
+    }
+
     private static UIElement? CreateElement(XamlElementSyntax syntax)
     {
         return syntax switch
         {
             XamlGridSyntax grid => CreateGrid(grid),
             XamlButtonSyntax button => CreateButton(button),
+            XamlTextBlockSyntax textBlock => CreateTextBlock(textBlock),
             _ => throw new NotSupportedException($"Preview does not support {syntax.GetType().Name}.")
         };
     }

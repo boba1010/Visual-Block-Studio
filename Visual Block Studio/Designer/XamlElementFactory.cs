@@ -5,17 +5,17 @@ namespace Visual_Block_Studio.Designer;
 
 public static class XamlElementFactory
 {
-    public static (FrameworkElement Element, XamlElementSyntax Syntax) CreateTextBox()
+    public static (FrameworkElement Element, XamlElementSyntax Syntax) CreateTextBlock()
     {
-        var element = new TextBox
+        var element = new TextBlock
         {
-            Text = "TextBox",
+            Text = "TextBlock",
             FontSize = 16,
         };
 
-        var syntax = new XamlTextBoxSyntax
+        var syntax = new XamlTextBlockSyntax
         {
-            Text = "TextBox",
+            Text = "TextBlock",
             FontSize = 16,
         };
 

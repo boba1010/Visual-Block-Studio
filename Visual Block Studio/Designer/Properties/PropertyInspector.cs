@@ -17,10 +17,21 @@ public sealed class PropertyInspector(Panel propsContainer, XamlDesignerDocument
             return;
 
         if (control is XamlContentSyntax content)
+        {
+            AddBackgroundProperty(element, control);
             AddContentProperty(element, content);
+        }
+
+        if (control is XamlTextBlockSyntax text)
+        {
+            AddTextProperty(element, text);
+            AddForegroundProperty(element, text);
+        }
+
+        if (control is XamlPanelSyntax panel)
+            AddBackgroundProperty(element, panel);
 
         AddSizeProperties(element, control);
-        AddBackgroundProperty(element, control);
         AddAlignmentProperties(element, control);
     }
 
@@ -40,6 +51,17 @@ public sealed class PropertyInspector(Panel propsContainer, XamlDesignerDocument
                     presenter.Content = value;
                     break;
             }
+        });
+    }
+
+    private void AddTextProperty(FrameworkElement element, XamlTextBlockSyntax text)
+    {
+        AddStringProperty("Text", text.Text, value =>
+        {
+            text.Text = value;
+
+            if (element is TextBlock textBlock)
+                textBlock.Text = value;
         });
     }
 
@@ -64,36 +86,53 @@ public sealed class PropertyInspector(Panel propsContainer, XamlDesignerDocument
         });
     }
 
-    private void AddBackgroundProperty(FrameworkElement element, XamlControlSyntax syntax)
+    private void AddForegroundProperty(FrameworkElement element, XamlTextBlockSyntax syntax)
     {
-        if (element is not (Panel or Border or Control))
-            return;
-
-        AddColorProperty("Background", syntax.Background, value =>
+        AddColorProperty("Foreground", syntax.Foreground, value =>
         {
             OnPropertyChanged(() =>
             {
-                syntax.Background = value;
+                syntax.Foreground = value;
 
-                var brush = new SolidColorBrush(ColorHelper.FromArgb(value.A, value.R, value.G, value.B));
-
-                switch (element)
-                {
-                    case Panel panel:
-                        panel.Background = brush;
-                        break;
-
-                    case Border border:
-                        border.Background = brush;
-                        break;
-
-                    case Control control:
-                        control.Background = brush;
-                        break;
-                }
+                if (element is TextBlock text)
+                    text.Foreground = CreateBrush(value);
             });
         });
     }
+
+    private void AddBackgroundProperty(FrameworkElement element, XamlControlSyntax syntax)
+    {
+        switch (syntax)
+        {
+            case XamlContentSyntax content:
+                AddColorProperty("Background", content.Background, value =>
+                {
+                    OnPropertyChanged(() =>
+                    {
+                        content.Background = value;
+
+                        if (element is ContentControl control)
+                            control.Background = CreateBrush(value);
+                    });
+                });
+                break;
+
+            case XamlPanelSyntax panel:
+                AddColorProperty("Background", panel.Background, value =>
+                {
+                    OnPropertyChanged(() =>
+                    {
+                        panel.Background = value;
+
+                        if (element is Panel control)
+                            control.Background = CreateBrush(value);
+                    });
+                });
+                break;
+        }
+    }
+
+    private static SolidColorBrush CreateBrush(Color value) => new(ColorHelper.FromArgb(value.A, value.R, value.G, value.B));
 
     private void AddAlignmentProperties(FrameworkElement element, XamlControlSyntax syntax)
     {

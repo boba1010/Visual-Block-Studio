@@ -1,5 +1,4 @@
 ﻿using XamlBlocksCompiler.Syntax;
-using XamlBlocksCompiler.Syntax.Controls;
 
 namespace Visual_Block_Studio.Designer;
 
@@ -9,15 +8,15 @@ public sealed class XamlDesignerDocument
     private readonly List<FrameworkElement> _elements = [];
 
     public int SyntaxCount => _syntaxByElement.Count;
-    public XamlControlSyntax? RootSyntax { get; set; }
+    public XamlElementSyntax? RootSyntax { get; set; }
 
-    public void AddSyntax(FrameworkElement element, XamlElementSyntax syntax)
+    public void AddSyntaxRelation(FrameworkElement element, XamlElementSyntax syntax)
     {
         _syntaxByElement.Add(element, syntax);
         _elements.Add(element);
     }
 
-    public void RemoveSyntax(FrameworkElement element)
+    public void RemoveSyntaxRelation(FrameworkElement element)
     {
         if (!_syntaxByElement.Remove(element))
             return;
