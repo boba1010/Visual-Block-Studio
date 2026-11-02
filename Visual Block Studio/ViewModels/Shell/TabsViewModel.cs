@@ -2,17 +2,17 @@
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using Visual_Block_Studio.Messages;
-using Visual_Block_Studio.Views;
 
 namespace Visual_Block_Studio.ViewModels.Shell;
 
-public partial class TabViewModel(string header, System.Type targetPageType, object navParams = null!) : ObservableObject
+public partial class TabViewModel(string header, Type targetPageType, object? param = null) : ObservableObject
 {
     [ObservableProperty]
     public partial string TabHeader { get; set; } = header;
 
-    public System.Type TargetPageType { get; } = targetPageType ?? typeof(TextEditor);
-    public object NavigationParameter { get; } = navParams;
+    public Frame? ContentFrame { get; set; }
+    public Type TargetPageType { get; } = targetPageType;
+    public object? Parameter { get; } = param;
 }
 
 public partial class TabsFactoryViewModel : ObservableObject
@@ -31,7 +31,7 @@ public partial class TabsFactoryViewModel : ObservableObject
         });
     }
 
-    public void OpenNewPageTab(string title, System.Type pageType, object parameter = null!)
+    public void OpenNewPageTab(string title, Type pageType, object parameter = null!)
     {
         var newTab = new TabViewModel(title, pageType, parameter);
         OpenTabs.Add(newTab);
@@ -40,6 +40,10 @@ public partial class TabsFactoryViewModel : ObservableObject
 
     public void CloseTab(TabViewModel tab)
     {
-        OpenTabs.Remove(tab);
+        if (!OpenTabs.Remove(tab))
+            return;
+
+        if (ReferenceEquals(SelectedTab, tab))
+            SelectedTab = OpenTabs.LastOrDefault()!;
     }
 }

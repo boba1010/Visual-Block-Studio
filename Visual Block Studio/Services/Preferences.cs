@@ -13,7 +13,7 @@ public static class Preferences<T>
     {
         string dir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "ReligiousQuizCompetitionWinUI");
+            "VBS");
 
         Directory.CreateDirectory(dir);
         return Path.Combine(dir, "preferences.json");

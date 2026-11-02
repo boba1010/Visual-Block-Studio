@@ -5,9 +5,6 @@ using Visual_Block_Studio.Windows;
 
 namespace Visual_Block_Studio;
 
-/// <summary>
-/// Provides application-specific behavior to supplement the default Application class.
-/// </summary>
 public partial class App : Application
 {
     public static Window? StartWorkspaceWindow { get; set; }
@@ -15,10 +12,6 @@ public partial class App : Application
 
     public static IServiceProvider Services { get; set; } = null!;
 
-    /// <summary>
-    /// Initializes the singleton application object.  This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
     public App()
     {
         InitializeComponent();
@@ -39,46 +32,17 @@ public partial class App : Application
 
     private static void ConfigureServices(ServiceCollection services)
     {
-        // -- Main Window viewmodels --------------------
         services.AddSingleton<ShellViewModel>();
-
         services.AddSingleton<TabsFactoryViewModel>();
+        services.AddTransient<CreateFileViewModel>();
+        services.AddSingleton<DashboardViewModel>();
 
-        services.AddSingleton<SolutionViewModel>();
-        services.AddSingleton<SolutionManager>();
-        services.AddSingleton<SolutionExplorerViewModel>();
-        
-        // -- Text Editor -------------------------------
-        services.AddTransient<TextEditorViewModel>();
-
-        // -- Services -----------------------------------
-        services.AddSingleton<VBSProjectManager>();
-        services.AddSingleton<TextEditorService>();
-        services.AddSingleton<TemplateProjectService>();
         services.AddSingleton<RecentsService>();
     }
 
-    /// <summary>
-    /// Invoked when the application is launched.
-    /// </summary>
-    /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        string[] commandLineArgs = Environment.GetCommandLineArgs();
-
-        // Check if a file path was passed to the app via double-click
-        if (commandLineArgs.Length > 1)
-        {
-            string targetFile = commandLineArgs[1];
-
-            StartWorkspaceWindow = new StartWorkspaceWindow(targetFile);
-            StartWorkspaceWindow.Activate();
-        }
-        else
-        {
-            // Open normal startup dashboard window (Visual Studio style)
-            StartWorkspaceWindow = new StartWorkspaceWindow();
-            StartWorkspaceWindow.Activate();
-        }
+        StartWorkspaceWindow = new StartWorkspaceWindow();
+        StartWorkspaceWindow.Activate();
     }
 }

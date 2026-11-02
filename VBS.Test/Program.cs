@@ -1,30 +1,27 @@
-﻿using XamlBlocksCompiler.Generation;
-using XamlBlocksCompiler.Syntax.Controls;
+﻿using CSharpBlocksCompiler;
+using CSharpBlocksCompiler.Emission;
+using CSharpBlocksCompiler.Syntax;
 
-namespace VBS.Test;
-
-internal class Program
+var declaration = new VariableDeclarationSyntax
 {
-    public static void Main()
-    {
-        var windowSyntax = new XamlWindowSyntax();
-        windowSyntax.Namespaces.Add(new("", "http://schemas.microsoft.com/winfx/2006/xaml/presentation"));
-        windowSyntax.Namespaces.Add(new("x", "http://schemas.microsoft.com/winfx/2006/xaml"));
+    Type = new TypeSyntax("int"),
+    Identifier = new IdentifierSyntax("x"),
+    Initializer = new LiteralExpressionSyntax(10, LiteralKind.Integer)
+};
 
-        var grid = new XamlGridSyntax();
+var assignment = new ExpressionStatementSyntax(
+    new AssignmentExpressionSyntax(
+        new IdentifierExpressionSyntax("x"),
+        new LiteralExpressionSyntax(20, LiteralKind.Integer)));
 
-        grid.Children.Add(new XamlButtonSyntax()
-        {
-            Content = "Button",
-            Width = 200,
-            Height = 40
-        });
+var tree = SyntaxTree.Create(new CompilationUnitSyntax([declaration, assignment]));
 
-        windowSyntax.Content = grid;
+var compilation = Compilation.Create(tree);
 
-        XamlCodeGenerator generator = new();
-        var xaml = generator.Generate(windowSyntax);
+foreach (var diagnostic in compilation.GetDiagnostics())
+    Console.WriteLine($"{diagnostic.Code}: {diagnostic.Message}");
 
-        Console.WriteLine(xaml);
-    }
-}
+var model = compilation.GetSemanticModel(tree);
+
+var emitter = new CSharpEmitter();
+Console.WriteLine(emitter.Emit(model.SyntaxTree));

@@ -74,16 +74,9 @@ public static partial class Clipboard
 
             try
             {
-                Marshal.Copy(
-                    text.ToCharArray(),
-                    0,
-                    target,
-                    text.Length);
+                Marshal.Copy(text.ToCharArray(), 0, target, text.Length);
 
-                Marshal.WriteInt16(
-                    target,
-                    text.Length * sizeof(char),
-                    0);
+                Marshal.WriteInt16(target, text.Length * sizeof(char), 0);
             }
             finally
             {

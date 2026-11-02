@@ -32,18 +32,11 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <FontIcon Glyph="{x:Bind GetRecentIcon(Type), Mode=OneWay}" FontSize="15" />
+                            <SymbolIcon Symbol="Document" />
 
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
-                                <TextBlock 
-                                    Text="{x:Bind FilePath, Mode=OneWay}" 
-                                    VerticalAlignment="Bottom"
-                                    Foreground="{StaticResource TextFillColorSecondary}"
-                                    FontSize="13"/>
-                            </StackPanel>
+                            <TextBlock Text="{x:Bind Name}" Grid.Column="1" />
 
-                            <TextBlock Grid.Column="2" Text="{x:Bind FriendlyDate, Mode=OneWay}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind FriendlyDate}" VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </AutoSuggestBox.ItemTemplate>
@@ -68,18 +61,11 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <FontIcon Glyph="{x:Bind GetRecentIcon(Type), Mode=OneWay}" FontSize="15" />
+                                <SymbolIcon Symbol="Document" />
 
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
-                                    <TextBlock 
-                                        Text="{x:Bind FilePath, Mode=OneWay}" 
-                                        VerticalAlignment="Bottom"
-                                        Foreground="{StaticResource TextFillColorSecondary}"
-                                        FontSize="13"/>
-                                </StackPanel>
+                                <TextBlock Text="{x:Bind Name}" Grid.Column="1" />
 
-                                <TextBlock Grid.Column="2" Text="{x:Bind FriendlyDate, Mode=OneWay}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="{x:Bind FriendlyDate}" VerticalAlignment="Center" />
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -93,35 +79,18 @@
             Spacing="12" Padding="10" 
             HorizontalAlignment="Left" 
             VerticalAlignment="Top">
-            <Button Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" Click="OnCreateProjectClick">
+            <Button Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" Click="OnCreateFileClick">
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <FontIcon Glyph="&#xE710;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"/>
-                    <TextBlock Text="Create a new project" FontSize="15" FontWeight="Medium"/>
+                    <SymbolIcon Symbol="Add" />
+                    <TextBlock Text="Create a new file" FontSize="15" FontWeight="Medium"/>
                 </StackPanel>
-            </Button>
-
-            <Button HorizontalAlignment="Stretch" Click="OnOpenProjectOrSolutionClick">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <FontIcon Glyph="&#xE71D;" FontFamily="{ThemeResource SymbolThemeFontFamily}" FontSize="18"/>
-                    <TextBlock Text="Open a project or solution" FontSize="15"/>
-                </StackPanel>
-            </Button>
-
-            <Button HorizontalAlignment="Stretch" Click="OnOpenFolderClick">
-                <Grid ColumnDefinitions="Auto, *">
-                    <FontIcon 
-                        Grid.Column="0" Glyph="&#xE8B7;" 
-                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                        FontSize="18" Margin="0,0,12,0"/>
-                    <TextBlock Grid.Column="1" Text="Open folder" FontSize="15" VerticalAlignment="Center"/>
-                </Grid>
             </Button>
         </StackPanel>
 
         <TeachingTip 
             Grid.Row="2"
             x:Name="errorTeachingTip"
-            Title="File Create Failed"
+            Title="Failed to open file"
             Subtitle="An issue occurred while processing the files."
             CloseButtonContent="Dismiss"
             PreferredPlacement="Bottom"

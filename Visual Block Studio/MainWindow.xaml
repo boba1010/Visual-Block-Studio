@@ -15,19 +15,11 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
         <TitleBar 
             IsTabStop="False"
-            Grid.ColumnSpan="3"
             x:Name="titlebar">
             <TitleBar.LeftHeader>
                 <Grid HorizontalAlignment="Left">
@@ -47,166 +39,48 @@
                             <AppBarButton.Flyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem Icon="Save" Text="Save" />
+                                    
                                     <MenuFlyoutItem Text="SaveAll">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE792;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
+                                    
                                     <MenuFlyoutItem Icon="OpenFile" Text="Open" />
                                     <MenuFlyoutSubItem Icon="Add" Text="Add">
                                         <MenuFlyoutItem Icon="Document" Text="Add a new file"/>
                                     </MenuFlyoutSubItem>
 
-                                    <MenuFlyoutItem Text="Close File"/>
-
-                                    <MenuFlyoutItem Text="Close Solution" />
-
                                     <MenuFlyoutItem Icon="Cancel"  Text="Exit" />
                                 </MenuFlyout>
                             </AppBarButton.Flyout>
-                        </AppBarButton>
-
-                        <AppBarButton 
-                            IsTabStop="False" Width="40"
-                            LabelPosition="Collapsed" 
-                            Icon="Undo" Label="Undo" 
-                            ToolTipService.ToolTip="Undo" />
-                        <AppBarButton 
-                            IsTabStop="False" Width="40" 
-                            LabelPosition="Collapsed" 
-                            Icon="Redo" Label="Redo" 
-                            ToolTipService.ToolTip="Redo" />
-
-                        <AppBarSeparator />
-
-                        <AppBarButton 
-                            Visibility="Collapsed"
-                            IsTabStop="False" Width="90" Label="Debug" 
-                            ToolTipService.ToolTip="Select which mode you want to compile your app in">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xEBE8;"/>
-                            </AppBarButton.Icon>
-                            <AppBarButton.Flyout>
-                                <MenuFlyout>
-                                    <ToggleMenuFlyoutItem Text="Debug" />
-                                    <ToggleMenuFlyoutItem Text="Release"/>
-                                </MenuFlyout>
-                            </AppBarButton.Flyout>
-                        </AppBarButton>
-
-                        <AppBarButton 
-                            IsTabStop="False" Width="150" 
-                            Label="CPU Architecture" Visibility="Collapsed"
-                            ToolTipService.ToolTip="Select the CPU architecture">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xEEA1;"/>
-                            </AppBarButton.Icon>
-                            <AppBarButton.Flyout>
-                                <MenuFlyout>
-                                    <ToggleMenuFlyoutItem Text="x64" />
-                                    <ToggleMenuFlyoutItem Text="x86" />
-                                    <ToggleMenuFlyoutItem Text="arm64" />
-                                </MenuFlyout>
-                            </AppBarButton.Flyout>
-                        </AppBarButton>
-
-                        <AppBarButton 
-                            IsTabStop="False" MinWidth="150" Visibility="Collapsed"
-                            Label="Visual blocks studio (Unpackaged)"
-                            ToolTipService.ToolTip="Run with debugger attached">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xF5B0;"/>
-                            </AppBarButton.Icon>
-                            <AppBarButton.Flyout>
-                                <MenuFlyout>
-                                    <ToggleMenuFlyoutItem Text="Packaged" />
-                                    <ToggleMenuFlyoutItem Text="Unpackaged" />
-                                </MenuFlyout>
-                            </AppBarButton.Flyout>
-                        </AppBarButton>
-
-                        <AppBarButton 
-                            IsTabStop="False"
-                            LabelPosition="Collapsed"
-                            Width="40"
-                            ToolTipService.ToolTip="Run without debugging">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xE768;"/>
-                            </AppBarButton.Icon>
                         </AppBarButton>
                     </CommandBar>
                 </Grid>
             </TitleBar.LeftHeader>
         </TitleBar>
 
-
-
-        <NavigationView
+        <TabView
+            Grid.Row="1"
             IsTabStop="False"
-            ItemInvoked="NavigationView_ItemInvoked"
-            IsBackButtonVisible="Collapsed"
-            IsSettingsVisible="False"
-            PaneDisplayMode="LeftMinimal"
-            Grid.ColumnSpan="2"
-            Grid.Row="2">
-            <NavigationView.Resources>
-                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
-            </NavigationView.Resources>
-
-            <NavigationView.MenuItems>
-                <NavigationViewItem 
-                    IsTabStop="False"
-                    SelectsOnInvoked="False"
-                    IsExpanded="True"
-                    MenuItemsSource="{x:Bind ViewModel.Solution.SolutionExplorer.ProjectMenuItems, Mode=OneWay}">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE737;"/>
-                    </NavigationViewItem.Icon>
-                    <TextBlock>
-                        <Run Text="Solution" />
-                        <Run Text="'" />
-                        <Run Text="{x:Bind ViewModel.Solution.SolutionName, Mode=OneWay}" />
-                        <Run Text="'" />
-                    </TextBlock>
-                </NavigationViewItem>
-            </NavigationView.MenuItems>
-
-            <NavigationView 
-                IsTabStop="False"
-                PaneTitle="Block Properties"
-                FlowDirection="RightToLeft"
-                IsBackButtonVisible="Collapsed"
-                IsPaneToggleButtonVisible="False"
-                IsSettingsVisible="False"
-                PaneDisplayMode="LeftMinimal"
-                Grid.Row="2"
-                Grid.Column="2">
-                <NavigationView.Resources>
-                    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
-                </NavigationView.Resources>
-
-                <TabView
-                    IsTabStop="False"
-                    x:Name="editorTabView"
-                    VerticalAlignment="Stretch"
-                    IsAddTabButtonVisible="False"
-                    TabItemsSource="{x:Bind ViewModel.Tabs.OpenTabs, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.Tabs.SelectedTab, Mode=TwoWay}"
-                    TabCloseRequested="EditorTabView_TabCloseRequested">
-                    <TabView.TabItemTemplate>
-                        <DataTemplate x:DataType="viewmodels:TabViewModel">
-                            <TabViewItem IsTabStop="False" Header="{x:Bind TabHeader, Mode=OneWay}">
-                                <TabViewItem.Content>
-                                    <Grid>
-                                        <Frame IsTabStop="False" Loaded="TabFrame_Loaded" DataContext="{x:Bind}" />
-                                    </Grid>
-                                </TabViewItem.Content>
-                            </TabViewItem>
-                        </DataTemplate>
-                    </TabView.TabItemTemplate>
-                </TabView>
-            </NavigationView>
-        </NavigationView>
+            x:Name="editorTabView"
+            VerticalAlignment="Stretch"
+            IsAddTabButtonVisible="False"
+            TabItemsSource="{x:Bind ViewModel.Tabs.OpenTabs, Mode=OneWay}"
+            SelectedItem="{x:Bind ViewModel.Tabs.SelectedTab, Mode=TwoWay}"
+            TabCloseRequested="EditorTabView_TabCloseRequested">
+            <TabView.TabItemTemplate>
+                <DataTemplate x:DataType="viewmodels:TabViewModel">
+                    <TabViewItem IsTabStop="False" Header="{x:Bind TabHeader, Mode=OneWay}">
+                        <TabViewItem.Content>
+                            <Grid>
+                                <Frame IsTabStop="False" Loaded="TabFrame_Loaded" DataContext="{x:Bind}" />
+                            </Grid>
+                        </TabViewItem.Content>
+                    </TabViewItem>
+                </DataTemplate>
+            </TabView.TabItemTemplate>
+        </TabView>
 
 
         <TeachingTip 

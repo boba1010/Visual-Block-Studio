@@ -26,7 +26,7 @@ public sealed class RecentsService
 
         for (int i = 0; i < recents.Count; i++)
         {
-            if (recents[i].FilePath == recent.FilePath)
+            if (recents[i].Id == recent.Id)
             {
                 recents[i] = recent;
                 break;

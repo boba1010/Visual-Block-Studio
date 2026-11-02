@@ -70,18 +70,6 @@ public sealed class XamlCodeGenerator
                     WriteNode(writer, child);
                 break;
 
-            case XamlWindowSyntax window when window.Content is not null:
-                if (window.Content is XamlElementSyntax or XamlPropertySyntax)
-                    WriteNode(writer, window.Content);
-                else
-                {
-                    writer.WriteAttributeString(
-                        "Content",
-                        Convert.ToString(window.Content, System.Globalization.CultureInfo.InvariantCulture)
-                    );
-                }
-                break;
-
             case XamlContentSyntax content when content.Content is not null:
                 if (content.Content is XamlElementSyntax or XamlPropertySyntax)
                     WriteNode(writer, content.Content);
@@ -89,7 +77,7 @@ public sealed class XamlCodeGenerator
                 {
                     writer.WriteAttributeString(
                         "Content", 
-                        Convert.ToString(content.Content, System.Globalization.CultureInfo.InvariantCulture)
+                        Convert.ToString(content.Content, CultureInfo.InvariantCulture)
                     );
                 }
                 break;
@@ -108,10 +96,6 @@ public sealed class XamlCodeGenerator
 
             case XamlGridSyntax grid:
                 XamlGridSyntaxXamlMetadata.WriteAttributes(writer, grid);
-                break;
-
-            case XamlWindowSyntax window:
-                XamlWindowSyntaxXamlMetadata.WriteAttributes(writer, window);
                 break;
         }
     }

@@ -90,7 +90,6 @@
                 <Canvas
                     x:Name="SelectionOverlay"
                     IsHitTestVisible="False" />
-
             </Grid>
         </ScrollViewer>
 
@@ -116,7 +115,6 @@
                 <StackPanel
                     x:Name="PropertiesContainer"
                     Spacing="12" />
-
             </ScrollViewer>
         </Grid>
     </Grid>
