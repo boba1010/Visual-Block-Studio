@@ -18,9 +18,9 @@ public sealed partial class CreateFilePage : Page
     {
         try
         {
-            ViewModel.CreateFile();
+            var recent = ViewModel.CreateFile();
 
-            App.WorkspaceWindow = new MainWindow(new(ViewModel.FileName, ""));
+            App.WorkspaceWindow = new MainWindow(recent);
             App.WorkspaceWindow.Activate();
 
             App.StartWorkspaceWindow?.Close();

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Visual_Block_Studio.Models;
 using Visual_Block_Studio.Services;
 
 namespace Visual_Block_Studio.ViewModels;
@@ -8,13 +9,17 @@ public sealed partial class CreateFileViewModel(RecentsService recents) : Observ
     [ObservableProperty]
     public partial string FileName { get; set; } = "NewFile";
 
-    public void CreateFile()
+    public Recent CreateFile()
     {
-        recents.Save(new()
+        var recent = new Recent()
         {
             Name = FileName,
             UpdatedAt = DateTime.Now,
             FileContent = "",
-        });
+        };
+
+        recents.Save(recent);
+
+        return recent;
     }
 }

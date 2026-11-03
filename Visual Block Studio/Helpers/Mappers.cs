@@ -10,6 +10,7 @@ public static class RecentMappers
     {
         return new()
         {
+            Id = dto.Id,
             Name = dto.Name,
             UpdatedAt = dto.UpdatedAt,
             FileContent = dto.FileContent,
@@ -20,6 +21,7 @@ public static class RecentMappers
     {
         return new()
         {
+            Id = model.Id,
             Name = model.Name,
             UpdatedAt = model.UpdatedAt,
             FileContent = model.FileContent,
@@ -29,7 +31,8 @@ public static class RecentMappers
     public static List<RecentDto> MapItemsToDtos(this ObservableCollection<Recent> recents)
     {
         return [.. recents.Select(r => new RecentDto 
-        { 
+        {
+            Id = r.Id,
             UpdatedAt = r.UpdatedAt,
             Name = r.Name,
             FileContent = r.FileContent,
@@ -39,6 +42,7 @@ public static class RecentMappers
     {
         return [.. recents.Select(r => new RecentDto
         {
+            Id = r.Id,
             UpdatedAt = r.UpdatedAt,
             Name = r.Name,
             FileContent = r.FileContent,
@@ -50,6 +54,7 @@ public static class RecentMappers
     {
         return [.. recents.Select(r => new Recent
         {
+            Id = r.Id,
             UpdatedAt = r.UpdatedAt,
             Name = r.Name,
             FileContent = r.FileContent,

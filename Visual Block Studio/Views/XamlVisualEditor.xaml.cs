@@ -1,6 +1,10 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Visual_Block_Studio.Designer;
 using Visual_Block_Studio.Designer.Properties;
 using Visual_Block_Studio.Designer.Selection;
+using Visual_Block_Studio.Messages;
+using Visual_Block_Studio.Models;
+using Visual_Block_Studio.Services;
 using Windows.ApplicationModel.DataTransfer;
 using XamlBlocksCompiler.Generation;
 using XamlBlocksCompiler.Syntax;
@@ -20,6 +24,8 @@ public sealed partial class XamlVisualEditor : Page
     private readonly SelectionManager _selection;
     private readonly PropertyInspector _propertyInspector;
     private readonly XamlPreviewController _preview;
+    private Recent _recent = null!;
+    private RecentsService _recents;
     private XamlEditorMode _mode = XamlEditorMode.Edit;
 
     public XamlEditorMode Mode
@@ -43,6 +49,7 @@ public sealed partial class XamlVisualEditor : Page
         _selection = new(SelectionOverlay, DesignSurface, _document);
         _propertyInspector = new(PropertiesContainer, _document, _selection.Update);
         _preview = new();
+        _recents = App.Services.GetRequiredService<RecentsService>();
 
         _selection.SelectionChanged += element =>
         {
@@ -57,6 +64,78 @@ public sealed partial class XamlVisualEditor : Page
 
         DesignSurface.SizeChanged += (_, _) => _selection.Update();
         DesignSurface.PointerPressed += DesignSurface_PointerPressed;
+
+        WeakReferenceMessenger.Default.Register<SaveMessage>(this, (r, m) => SaveChangesIfExists());
+
+        WeakReferenceMessenger.Default.Register<SaveAllMessage>(this, (r, m) => SaveChangesIfExists());
+
+        WeakReferenceMessenger.Default.Register<ClosingAllMessage>(this, (r, m) =>
+        {
+            var xaml = GenerateXaml();
+            var dirty = _recent.FileContent != xaml;
+            m.Reply(dirty);
+        });
+
+        WeakReferenceMessenger.Default.Register<ClosingTabMessage>(this, (r, m) =>
+        {
+            if (_recent.Id != m.Id)
+                return;
+
+            var xaml = GenerateXaml();
+            if (_recent.FileContent == xaml)
+                return;
+
+            m.Reply(ShowDialogAsync());
+
+            async Task<bool> ShowDialogAsync()
+            {
+                var dialog = new ContentDialog()
+                {
+                    Title = "Unsaved changes to the following",
+                    Content = _recent.Name,
+                    PrimaryButtonText = "Save",
+                    SecondaryButtonText = "Don't Save",
+                    CloseButtonText = "Cancel",
+                    XamlRoot = XamlRoot,
+                };
+
+                var result = await dialog.ShowAsync();
+                if (result is ContentDialogResult.Primary)
+                {
+                    SaveChanges();
+                    return true;
+                }
+                else if (result is ContentDialogResult.Secondary)
+                    return true;
+
+                return false;
+            }
+        });
+    }
+
+    private void SaveChangesIfExists()
+    {
+        var xaml = GenerateXaml();
+        if (_recent.FileContent == xaml)
+            return;
+
+        _recent.FileContent = xaml;
+        _recents.Update(_recent);
+    }
+
+    private void SaveChanges()
+    {
+        string xaml = GenerateXaml();
+        _recent.FileContent = xaml;
+        _recents.Update(_recent);
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        if (e.Parameter is Recent recent)
+            _recent = recent;
     }
 
     private void UpdateMode()
@@ -159,15 +238,22 @@ public sealed partial class XamlVisualEditor : Page
 
     private void GenerateXaml_Click(object sender, RoutedEventArgs e)
     {
-        if (_document.RootSyntax is null)
-            return;
-
-        var generator = new XamlCodeGenerator();
-        string xaml = generator.Generate(_document.RootSyntax);
+        string xaml = GenerateXaml();
 
         var package = new DataPackage();
         package.SetText(xaml);
 
         Clipboard.SetContent(package);
+    }
+
+    private string GenerateXaml()
+    {
+        if (_document.RootSyntax is null)
+            return "";
+
+        var generator = new XamlCodeGenerator();
+        string xaml = generator.Generate(_document.RootSyntax);
+
+        return xaml;
     }
 }

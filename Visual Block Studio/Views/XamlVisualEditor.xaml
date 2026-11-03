@@ -32,12 +32,10 @@
                 Unchecked="PropertiesToggle_Changed" />
 
             <Button 
-                x:Name="FullScreenPreview"
                 Content="FullScreen Preview"
                 Click="FullScreenPreview_Click"/>
             
             <Button 
-                x:Name="GenerateXaml"
                 Content="Generate Xaml"
                 Click="GenerateXaml_Click"/>
         </StackPanel>

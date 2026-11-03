@@ -112,7 +112,9 @@ VBS 2G is currently under development.
 | Interactive preview | Implemented |
 | XAML generation | Implemented |
 | Clipboard integration | Implemented |
-| Document saving | Not implemented yet |
+| Document saving | Implemented |
+| Adding new files | Not Implemented Yet |
+| Opening files | Not Implemented Yet |
 
 ## Philosophy
 

@@ -1,3 +1,4 @@
+using ABI.Windows.Foundation;
 using System.Collections.ObjectModel;
 using Visual_Block_Studio.Models;
 using Visual_Block_Studio.Services;
@@ -41,7 +42,7 @@ public sealed partial class DashboardPage : Page
             selectedItem.UpdatedAt = DateTime.Now;
             RecentsService.Update(recent);
 
-            App.WorkspaceWindow = new MainWindow(new(recent.Name, recent.FileContent));
+            App.WorkspaceWindow = new MainWindow(recent);
             App.WorkspaceWindow.Activate();
 
             listView.SelectedItem = null;
@@ -72,7 +73,7 @@ public sealed partial class DashboardPage : Page
             selectedItem.UpdatedAt = DateTime.Now;
             RecentsService.Update(selectedItem);
 
-            App.WorkspaceWindow = new MainWindow(new(selectedItem.Name, selectedItem.FileContent));
+            App.WorkspaceWindow = new MainWindow(selectedItem);
             App.WorkspaceWindow.Activate();
 
             App.StartWorkspaceWindow?.Close();

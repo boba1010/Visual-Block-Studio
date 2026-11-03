@@ -2,9 +2,8 @@
 
 namespace Visual_Block_Studio.Messages;
 
-public class OpenTabRequestMessage : ValueChangedMessage<OpenTabRequestArgs>
+public class OpenTabRequestMessage(OpenTabRequestArgs value) : ValueChangedMessage<OpenTabRequestArgs>(value)
 {
-    public OpenTabRequestMessage(OpenTabRequestArgs value) : base(value) { }
 }
 
 public class OpenTabRequestArgs

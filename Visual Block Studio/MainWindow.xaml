@@ -12,15 +12,13 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="Root">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar 
-            IsTabStop="False"
-            x:Name="titlebar">
+        <TitleBar IsTabStop="False" x:Name="titlebar">
             <TitleBar.LeftHeader>
                 <Grid HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
@@ -38,9 +36,9 @@
                         <AppBarButton IsTabStop="False" Width="80" Icon="Folder" Label="Files" ToolTipService.ToolTip="File actions">
                             <AppBarButton.Flyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Icon="Save" Text="Save" />
+                                    <MenuFlyoutItem Icon="Save" Text="Save" Command="{x:Bind ViewModel.SaveCommand}" />
                                     
-                                    <MenuFlyoutItem Text="SaveAll">
+                                    <MenuFlyoutItem Text="SaveAll" Command="{x:Bind ViewModel.SaveAllCommand}">
                                         <MenuFlyoutItem.Icon>
                                             <FontIcon Glyph="&#xE792;" />
                                         </MenuFlyoutItem.Icon>
@@ -48,10 +46,8 @@
                                     
                                     <MenuFlyoutItem Icon="OpenFile" Text="Open" />
                                     <MenuFlyoutSubItem Icon="Add" Text="Add">
-                                        <MenuFlyoutItem Icon="Document" Text="Add a new file"/>
+                                        <MenuFlyoutItem Icon="Document" Text="Add a new file" Command="{x:Bind ViewModel.AddNewFileCommand}"/>
                                     </MenuFlyoutSubItem>
-
-                                    <MenuFlyoutItem Icon="Cancel"  Text="Exit" />
                                 </MenuFlyout>
                             </AppBarButton.Flyout>
                         </AppBarButton>
@@ -81,25 +77,5 @@
                 </DataTemplate>
             </TabView.TabItemTemplate>
         </TabView>
-
-
-        <TeachingTip 
-            Grid.Row="2"
-            Grid.ColumnSpan="3"
-            x:Name="ErrorTeachingTip"
-            IsTabStop="False"
-            Title="File Load Failed"
-            Subtitle="An issue occurred while processing the block map schema structure."
-            CloseButtonContent="Dismiss"
-            PreferredPlacement="Bottom"
-            PlacementMargin="20">
-            <TeachingTip.IconSource>
-                <FontIconSource Glyph="&#xEA39;" 
-                        FontFamily="{ThemeResource SymbolThemeFontFamily}" 
-                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
-            </TeachingTip.IconSource>
-
-            <TextBlock x:Name="ErrorDetailsText" TextWrapping="Wrap" MaxWidth="300"/>
-        </TeachingTip>
     </Grid>
 </Window>
