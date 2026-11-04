@@ -107,14 +107,14 @@ VBS 2G is currently under development.
 | Visual designer | Implemented |
 | Toolbox | Implemented |
 | Property inspector | Implemented |
-| XAML import | Implemented |
+| XAML import | Not Implemented Yet |
 | Fullscreen preview | Implemented |
 | Interactive preview | Implemented |
 | XAML generation | Implemented |
 | Clipboard integration | Implemented |
 | Document saving | Implemented |
 | Adding new files | Implemented |
-| Opening files | Partially Implemented |
+| Opening files | Implemented |
 
 ## Philosophy
 

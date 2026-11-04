@@ -134,6 +134,16 @@ public sealed partial class MainWindow : Window
             return;
 
         var recent = dialog.Recent;
+
+        foreach (var tab in ViewModel.Tabs.OpenTabs)
+        {
+            if (tab.Parameter is not Recent tabRecent)
+                continue;
+
+            if (tabRecent.Id == recent.Id)
+                return;
+        }
+
         ViewModel.Tabs.OpenNewPageTab(recent.Name, typeof(XamlVisualEditor), recent);
     }
 }
