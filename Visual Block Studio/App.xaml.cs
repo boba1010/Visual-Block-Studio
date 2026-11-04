@@ -35,7 +35,7 @@ public partial class App : Application
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<TabsFactoryViewModel>();
         services.AddTransient<CreateFileViewModel>();
-        services.AddSingleton<DashboardViewModel>();
+        services.AddTransient<RecentsViewModel>();
 
         services.AddSingleton<RecentsService>();
     }

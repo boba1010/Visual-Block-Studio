@@ -1,36 +1,42 @@
-using ABI.Windows.Foundation;
-using System.Collections.ObjectModel;
 using Visual_Block_Studio.Models;
-using Visual_Block_Studio.Services;
-using Visual_Block_Studio.ViewModels.Shell;
+using Visual_Block_Studio.ViewModels;
+using Visual_Block_Studio.Views.Controls;
 
 namespace Visual_Block_Studio.Views.Dashboard;
 
 public sealed partial class DashboardPage : Page
 {
-    public ObservableCollection<Recent> Recents { get; private set; } = [];
-    public RecentsService RecentsService { get; set; }
-    public ShellViewModel ViewModel { get; set; }
+    public RecentsViewModel ViewModel { get; }
 
     public DashboardPage()
     {
         InitializeComponent();
 
-        RecentsService = App.Services.GetRequiredService<RecentsService>();
-        ViewModel = App.Services.GetRequiredService<ShellViewModel>();
+        ViewModel = App.Services.GetRequiredService<RecentsViewModel>();
 
         Loading += DashboardPage_Loading;
     }
 
     private void DashboardPage_Loading(FrameworkElement sender, object args)
     {
-        foreach (var item in RecentsService.Get())
-            Recents.Add(item);
+        ViewModel.LoadRecents();   
     }
 
-    private void OnCreateFileClick(object sender, RoutedEventArgs e)
+    private async void OnCreateFileClick(object sender, RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(CreateFilePage));
+        var dialog = new CreateFileDialog
+        {
+            XamlRoot = XamlRoot,
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result is ContentDialogResult.None)
+            return;
+
+        var recent = dialog.Recent;
+
+        OpenWorkspaceWindow(recent);
     }
 
     private async void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -39,16 +45,11 @@ public sealed partial class DashboardPage : Page
         {
             Recent recent = selectedItem;
 
-            selectedItem.UpdatedAt = DateTime.Now;
-            RecentsService.Update(recent);
+            ViewModel.UpdateRecent(recent);
 
-            App.WorkspaceWindow = new MainWindow(recent);
-            App.WorkspaceWindow.Activate();
+            OpenWorkspaceWindow(recent);
 
             listView.SelectedItem = null;
-
-            App.StartWorkspaceWindow?.Close();
-            App.StartWorkspaceWindow = null;
         }
     }
 
@@ -56,7 +57,7 @@ public sealed partial class DashboardPage : Page
     {
         if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
         {
-            var suitableItems = Recents
+            var suitableItems = ViewModel.Recents
                 .Where(item => item.Name.StartsWith(sender.Text, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
@@ -68,16 +69,20 @@ public sealed partial class DashboardPage : Page
     {
         if (args.ChosenSuggestion != null)
         {
-            var selectedItem = (Recent)args.ChosenSuggestion;
+            var recent = (Recent)args.ChosenSuggestion;
 
-            selectedItem.UpdatedAt = DateTime.Now;
-            RecentsService.Update(selectedItem);
+            ViewModel.UpdateRecent(recent);
 
-            App.WorkspaceWindow = new MainWindow(selectedItem);
-            App.WorkspaceWindow.Activate();
-
-            App.StartWorkspaceWindow?.Close();
-            App.StartWorkspaceWindow = null;
+            OpenWorkspaceWindow(recent);
         }
+    }
+
+    private void OpenWorkspaceWindow(Recent recent)
+    {
+        App.WorkspaceWindow = new MainWindow(recent);
+        App.WorkspaceWindow.Activate();
+
+        App.StartWorkspaceWindow?.Close();
+        App.StartWorkspaceWindow = null;
     }
 }

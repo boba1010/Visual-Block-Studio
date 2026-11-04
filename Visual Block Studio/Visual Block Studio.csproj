@@ -19,8 +19,10 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\Controls\Badge.xaml" />
+    <None Remove="Views\Controls\CreateFileDialog.xaml" />
     <None Remove="Views\Controls\FilePickerDialog.xaml" />
     <None Remove="Views\Controls\FolderPickerDialog.xaml" />
+    <None Remove="Views\Controls\OpenFileDialog.xaml" />
     <None Remove="Views\Dashboard\DashboardPage.xaml" />
     <None Remove="Views\XamlVisualEditor.xaml" />
   </ItemGroup>
@@ -60,11 +62,6 @@
 	<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Dashboard\CreateFilePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Windows\StartWorkspaceWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -77,6 +74,16 @@
   <ItemGroup>
     <ProjectReference Include="..\XamlBlocksCompiler\XamlBlocksCompiler.csproj" />
     <ProjectReference Include="..\XamlPreviewer\XamlPreviewer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\OpenFileDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Controls\CreateFileDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\XamlVisualEditor.xaml">

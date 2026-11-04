@@ -83,7 +83,10 @@ public sealed partial class XamlVisualEditor : Page
 
             var xaml = GenerateXaml();
             if (_recent.FileContent == xaml)
+            {
+                m.Reply(true);
                 return;
+            }
 
             m.Reply(ShowDialogAsync());
 

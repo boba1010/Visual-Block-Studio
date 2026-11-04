@@ -3,6 +3,7 @@ using Visual_Block_Studio.Messages;
 using Visual_Block_Studio.Models;
 using Visual_Block_Studio.ViewModels.Shell;
 using Visual_Block_Studio.Views;
+using Visual_Block_Studio.Views.Controls;
 
 namespace Visual_Block_Studio;
 
@@ -102,5 +103,37 @@ public sealed partial class MainWindow : Window
 
         if (frame.Content is null)
             frame.Navigate(tab.TargetPageType, tab.Parameter);
+    }
+
+    private async void AddNewFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new CreateFileDialog()
+        {
+            XamlRoot = Root.XamlRoot,
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result is ContentDialogResult.None)
+            return;
+
+        var recent = dialog.Recent;
+        ViewModel.Tabs.OpenNewPageTab(recent.Name, typeof(XamlVisualEditor), recent);
+    }
+
+    private async void OpenFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            XamlRoot = Root.XamlRoot,
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result is ContentDialogResult.None)
+            return;
+
+        var recent = dialog.Recent;
+        ViewModel.Tabs.OpenNewPageTab(recent.Name, typeof(XamlVisualEditor), recent);
     }
 }

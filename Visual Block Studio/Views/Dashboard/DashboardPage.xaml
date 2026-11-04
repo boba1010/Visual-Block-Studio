@@ -50,7 +50,7 @@
                 <ListView 
                     HorizontalAlignment="Stretch" 
                     VerticalAlignment="Stretch" 
-                    ItemsSource="{x:Bind Recents, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.Recents, Mode=OneWay}"
                     SelectionChanged="ListView_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:Recent">

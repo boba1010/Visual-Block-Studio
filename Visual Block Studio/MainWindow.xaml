@@ -44,9 +44,9 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     
-                                    <MenuFlyoutItem Icon="OpenFile" Text="Open" />
+                                    <MenuFlyoutItem Icon="OpenFile" Text="Open" Click="OpenFile_Click" />
                                     <MenuFlyoutSubItem Icon="Add" Text="Add">
-                                        <MenuFlyoutItem Icon="Document" Text="Add a new file" Command="{x:Bind ViewModel.AddNewFileCommand}"/>
+                                        <MenuFlyoutItem Icon="Document" Text="Add a new file" Click="AddNewFile_Click"/>
                                     </MenuFlyoutSubItem>
                                 </MenuFlyout>
                             </AppBarButton.Flyout>

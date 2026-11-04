@@ -11,6 +11,9 @@ public sealed partial class CreateFileViewModel(RecentsService recents) : Observ
 
     public Recent CreateFile()
     {
+        if (string.IsNullOrEmpty(FileName) || string.IsNullOrEmpty(FileName.Trim()))
+            throw new InvalidDataException("Please enter a valid file name");
+
         var recent = new Recent()
         {
             Name = FileName,

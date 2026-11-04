@@ -25,10 +25,4 @@ public partial class ShellViewModel(TabsFactoryViewModel tabs) : ObservableObjec
     {
         WeakReferenceMessenger.Default.Send(new SaveAllMessage());
     }
-
-    [RelayCommand]
-    public void AddNewFile()
-    {
-
-    }
 }
