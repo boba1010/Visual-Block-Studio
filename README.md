@@ -107,7 +107,7 @@ VBS 2G is currently under development.
 | Visual designer | Implemented |
 | Toolbox | Implemented |
 | Property inspector | Implemented |
-| XAML import | Not Implemented Yet |
+| XAML import | Implemented |
 | Fullscreen preview | Implemented |
 | Interactive preview | Implemented |
 | XAML generation | Implemented |
@@ -115,6 +115,100 @@ VBS 2G is currently under development.
 | Document saving | Implemented |
 | Adding new files | Implemented |
 | Opening files | Implemented |
+| Deleting elements | Implemented |
+| Undo/Redo | Not Implemented Yet |
+
+## Supported XAML Reference
+
+## Supported Controls
+
+| Control | Type | Description |
+|---|---|---|
+| `Grid` | Panel | Container for nested controls. |
+| `Button` | Content | Interactive button with text or content. |
+| `TextBlock` | Control | Displays text. |
+
+## Supported Properties
+
+### Grid
+
+| Property | Type | Example |
+|---|---|---|
+| `Background` | Color | `#FF236EFF` |
+| `Width` | `double` | `200` |
+| `Height` | `double` | `120` |
+| `VerticalAlignment` | Alignment | `Center` |
+| `HorizontalAlignment` | Alignment | `Center` |
+
+### Button
+
+| Property | Type | Example |
+|---|---|---|
+| `Background` | Color | `#00000000` |
+| `Foreground` | Color | `#FFFFFFFF` |
+| `Width` | `double` | `120` |
+| `Height` | `double` | `40` |
+| `VerticalAlignment` | Alignment | `Center` |
+| `HorizontalAlignment` | Alignment | `Center` |
+| `Content` | Object / Text | `Button` |
+
+### TextBlock
+
+| Property | Type | Example |
+|---|---|---|
+| `Text` | String | `Hello, world!` |
+| `FontSize` | `double` | `16` |
+| `Foreground` | Color | `#FFFFFFFF` |
+| `Width` | `double` | `100` |
+| `Height` | `double` | `30` |
+| `VerticalAlignment` | Alignment | `Center` |
+| `HorizontalAlignment` | Alignment | `Center` |
+
+## Alignment Values
+
+- `Left`
+- `Center`
+- `Right`
+- `Stretch`
+- `Top`
+- `Bottom`
+
+## Color Format
+
+Colors use hexadecimal ARGB notation:
+
+`#AARRGGBB`
+
+Examples:
+- `#FFFF0000` — Red
+- `#FF00FF00` — Green
+- `#FF0000FF` — Blue
+- `#FFFFFFFF` — White
+- `#FF000000` — Black
+- `#00000000` — Transparent
+
+## Example
+
+```xml
+<Grid Background="#FF236EFF"
+      Width="200"
+      Height="120"
+      VerticalAlignment="Center"
+      HorizontalAlignment="Center">
+
+    <TextBlock Text="Hello, world!"
+               FontSize="16"
+               Foreground="#FFFFFFFF"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center" />
+</Grid>
+```
+
+## Notes
+
+- Controls can be nested inside supported panel controls.
+- Properties are specified using standard XAML attribute syntax.
+- Unsupported controls and properties are not guaranteed to import correctly.
 
 ## Philosophy
 

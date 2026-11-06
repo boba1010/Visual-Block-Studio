@@ -7,8 +7,10 @@ using Visual_Block_Studio.Models;
 using Visual_Block_Studio.Services;
 using Windows.ApplicationModel.DataTransfer;
 using XamlBlocksCompiler.Generation;
+using XamlBlocksCompiler.Parsing;
 using XamlBlocksCompiler.Syntax;
 using XamlBlocksCompiler.Syntax.Controls;
+using XamlPreviewer;
 
 namespace Visual_Block_Studio.Views;
 
@@ -25,7 +27,7 @@ public sealed partial class XamlVisualEditor : Page
     private readonly PropertyInspector _propertyInspector;
     private readonly XamlPreviewController _preview;
     private Recent _recent = null!;
-    private RecentsService _recents;
+    private readonly RecentsService _recents;
     private XamlEditorMode _mode = XamlEditorMode.Edit;
 
     public XamlEditorMode Mode
@@ -55,10 +57,12 @@ public sealed partial class XamlVisualEditor : Page
         {
             if (element is null)
             {
+                DeleteButton.IsEnabled = false;
                 _propertyInspector.Clear();
                 return;
             }
 
+            DeleteButton.IsEnabled = true;
             _propertyInspector.Inspect(element);
         };
 
@@ -81,14 +85,21 @@ public sealed partial class XamlVisualEditor : Page
             if (_recent.Id != m.Id)
                 return;
 
-            var xaml = GenerateXaml();
-            if (_recent.FileContent == xaml)
+            try
             {
-                m.Reply(true);
-                return;
-            }
 
-            m.Reply(ShowDialogAsync());
+                var xaml = GenerateXaml();
+                if (_recent.FileContent == xaml)
+                {
+                    m.Reply(true);
+                    return;
+                }
+
+                m.Reply(ShowDialogAsync());
+            }
+            catch (Exception)
+            {
+            }
 
             async Task<bool> ShowDialogAsync()
             {
@@ -138,7 +149,32 @@ public sealed partial class XamlVisualEditor : Page
         base.OnNavigatedTo(e);
 
         if (e.Parameter is Recent recent)
+        {
             _recent = recent;
+            if (string.IsNullOrEmpty(recent.FileContent))
+                return;
+
+            _document.RootSyntax = XamlParser.Parse(recent.FileContent);
+            RefreshGrid();
+        }
+    }
+
+    private void RefreshGrid()
+    {
+        switch (_document.RootSyntax)
+        {
+            case XamlPanelSyntax panel:
+                if (panel is XamlGridSyntax grid)
+                    AddGrid(grid);
+                break;
+            case XamlContentSyntax content:
+                if (content is XamlButtonSyntax button)
+                    AddButton(button);
+                break;
+            case XamlTextBlockSyntax text:
+                AddTextBlock(text);
+                break;
+        }
     }
 
     private void UpdateMode()
@@ -171,20 +207,84 @@ public sealed partial class XamlVisualEditor : Page
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        var (element, syntax) = XamlElementFactory.CreateButton();
-        AddControl(element, syntax);
+        AddButton();
     }
 
     private void AddTextBlock_Click(object sender, RoutedEventArgs e)
     {
-        var (element, syntax) = XamlElementFactory.CreateTextBlock();
-        AddControl(element, syntax);
+        AddTextBlock();
     }
 
     private void AddGrid_Click(object sender, RoutedEventArgs e)
     {
-        var (element, syntax) = XamlElementFactory.CreateGrid();
-        AddControl(element, syntax);
+        AddGrid();
+    }
+
+    private void AddGrid(XamlGridSyntax? gridSyntax = null)
+    {
+        if (gridSyntax is null)
+        {
+            var (element, syntax) = XamlElementFactory.CreateGrid();
+            AddControl(element, syntax);
+            return;
+        }
+
+        var grid = XamlFactory.CreateGrid(gridSyntax);
+
+        if (PreviewSurface.Children.Count == 0)
+        {
+            PreviewSurface.Children.Add(grid);
+            _document.RootSyntax = gridSyntax;
+        }
+        else
+        {
+            (PreviewSurface.Children[0] as Grid)?.Children.Add(grid);
+            (_document.RootSyntax as XamlPanelSyntax)?.Children.Add(gridSyntax);
+        }
+
+        _selection.Select(grid);
+
+        RegisterTree(grid, gridSyntax);
+    }
+
+    private void RegisterTree(FrameworkElement element, XamlElementSyntax syntax)
+    {
+        RegisterControl(element, syntax);
+
+        if (element is not Panel panel || syntax is not XamlPanelSyntax panelSyntax)
+            return;
+
+        for (int i = 0; i < panelSyntax.Children.Count; i++)
+        {
+            if (panel.Children[i] is FrameworkElement child)
+                RegisterTree(child, panelSyntax.Children[i]);
+        }
+    }
+
+    private void AddButton(XamlButtonSyntax? buttonSyntax = null)
+    {
+        if (buttonSyntax is null)
+        {
+            var (element, syntax) = XamlElementFactory.CreateButton();
+            AddControl(element, syntax);
+            return;
+        }
+
+        var btn = XamlFactory.CreateButton(buttonSyntax);
+        AddControl(btn, buttonSyntax);
+    }
+
+    private void AddTextBlock(XamlTextBlockSyntax? textSyntax = null)
+    {
+        if (textSyntax is null)
+        {
+            var (element, syntax) = XamlElementFactory.CreateTextBlock();
+            AddControl(element, syntax);
+            return;
+        }
+
+        var text = XamlFactory.CreateTextBlock(textSyntax);
+        AddControl(text, textSyntax);
     }
 
     private void AddControl(FrameworkElement element, XamlElementSyntax syntax)
@@ -202,11 +302,15 @@ public sealed partial class XamlVisualEditor : Page
         else
             return;
 
-        _document.AddSyntaxRelation(element, syntax);
-
-        element.SizeChanged += Control_SizeChanged;
+        RegisterControl(element, syntax);
 
         _selection.Select(element);
+    }
+
+    private void RegisterControl(FrameworkElement element, XamlElementSyntax syntax)
+    {
+        _document.AddSyntaxRelation(element, syntax);
+        element.SizeChanged += Control_SizeChanged;
     }
 
     private void Control_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -258,5 +362,34 @@ public sealed partial class XamlVisualEditor : Page
         string xaml = generator.Generate(_document.RootSyntax);
 
         return xaml;
+    }
+
+    private void Delete_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        RemoveControl();
+    }
+
+    private void Delete_Click(object sender, RoutedEventArgs e)
+    {
+        RemoveControl();
+    }
+
+    private void RemoveControl()
+    {
+        var selected = _selection.SelectedElement;
+
+        if (selected is null)
+            return;
+
+        _document.RemoveSyntaxRelation(selected);
+        
+        PreviewSurface.Children.Remove(selected);
+
+        _selection.Clear();
+    }
+
+    private void Escape_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        _selection.Clear();
     }
 }

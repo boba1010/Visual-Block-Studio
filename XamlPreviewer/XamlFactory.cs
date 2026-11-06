@@ -10,24 +10,33 @@ using XamlBlocksCompiler.Syntax.Controls;
 
 namespace XamlPreviewer;
 
-public static class XamlPreviewer
+public static class XamlFactory
 {
-    public static object? Load(XamlElementSyntax element)
+    public static UIElement? Create(XamlElementSyntax element)
     {
         if (element is XamlPanelSyntax panel)
         {
             switch (panel)
             {
                 case XamlGridSyntax gridSyntax:
-                    var grid = CreateGrid(gridSyntax);
-                    return grid;
+                    return CreateGrid(gridSyntax);
             }
         }
+        else if (element is XamlContentSyntax content)
+        {
+            switch (content)
+            {
+                case XamlButtonSyntax buttonSyntax:
+                    return CreateButton(buttonSyntax);
+            }
+        }
+        else if (element is XamlTextBlockSyntax text)
+            return CreateTextBlock(text);
 
         return null;
     }
 
-    private static Grid CreateGrid(XamlGridSyntax syntax)
+    public static Grid CreateGrid(XamlGridSyntax syntax)
     {
         var bgc = syntax.Background;
 
@@ -49,7 +58,7 @@ public static class XamlPreviewer
         return grid;
     }
 
-    private static Button CreateButton(XamlButtonSyntax syntax)
+    public static Button CreateButton(XamlButtonSyntax syntax)
     {
         var bgc = syntax.Background;
 
@@ -70,7 +79,7 @@ public static class XamlPreviewer
         return button;
     }
 
-    private static TextBlock CreateTextBlock(XamlTextBlockSyntax syntax)
+    public static TextBlock CreateTextBlock(XamlTextBlockSyntax syntax)
     {
         var bgc = syntax.Foreground;
 
@@ -88,7 +97,7 @@ public static class XamlPreviewer
         return textBlock;
     }
 
-    private static UIElement? CreateElement(XamlElementSyntax syntax)
+    public static UIElement? CreateElement(XamlElementSyntax syntax)
     {
         return syntax switch
         {

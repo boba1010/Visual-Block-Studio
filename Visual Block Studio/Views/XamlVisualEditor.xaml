@@ -5,6 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Visual_Block_Studio.Views">
 
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Delete" Invoked="Delete_Invoked" />
+        <KeyboardAccelerator Key="Escape" Invoked="Escape_Invoked" />
+    </Page.KeyboardAccelerators>
+    
     <Grid Background="#FF202020" Padding="10" ColumnSpacing="10" RowSpacing="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -31,13 +36,11 @@
                 Checked="PropertiesToggle_Changed"
                 Unchecked="PropertiesToggle_Changed" />
 
-            <Button 
-                Content="FullScreen Preview"
-                Click="FullScreenPreview_Click"/>
+            <Button Content="FullScreen Preview" Click="FullScreenPreview_Click"/>
             
-            <Button 
-                Content="Generate Xaml"
-                Click="GenerateXaml_Click"/>
+            <Button Content="Generate Xaml" Click="GenerateXaml_Click"/>
+            
+            <Button x:Name="DeleteButton" Content="Delete selected element" Click="Delete_Click"/>
         </StackPanel>
         
         <!-- Toolbox -->

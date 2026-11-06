@@ -10,7 +10,7 @@ public sealed class XamlPreviewController
     {
         Close();
 
-        var content = XamlPreviewer.XamlPreviewer.Load(rootSyntax);
+        var content = XamlPreviewer.XamlFactory.Create(rootSyntax);
 
         if (content is not UIElement element)
             return;

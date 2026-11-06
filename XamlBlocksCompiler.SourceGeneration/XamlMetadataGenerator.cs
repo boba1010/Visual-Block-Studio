@@ -12,65 +12,80 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
 {
     private const string AttributeName = "XamlBlocksCompiler.Syntax.XamlControlAttribute";
 
+    private const string ContentSyntaxName = "XamlBlocksCompiler.Syntax.Controls.XamlContentSyntax";
+
     private static readonly HashSet<string> ExcludedProperties =
     [
         "Namespaces",
         "Attributes",
         "Name",
-        "Children",
-        "Content"
+        "Children"
     ];
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var controls = context.SyntaxProvider.ForAttributeWithMetadataName(
-            AttributeName,
-            static (node, _) => node is ClassDeclarationSyntax,
-            static (ctx, _) => (INamedTypeSymbol)ctx.TargetSymbol)
+                AttributeName,
+                static (node, _) => node is TypeDeclarationSyntax,
+                static (ctx, _) => (INamedTypeSymbol)ctx.TargetSymbol)
             .Where(static type => IsSupportedControl(type));
 
-        // Generate metadata for each individual control.
         context.RegisterSourceOutput(controls, static (spc, type) =>
         {
             var properties = GetProperties(type)
-                .Where(static property =>
-                    property is
-                    {
-                        IsStatic: false,
-                        IsIndexer: false,
-                        DeclaredAccessibility: Accessibility.Public,
-                        GetMethod.DeclaredAccessibility: Accessibility.Public
-                    })
+                .Where(IsReadableProperty)
                 .Where(static property => !ExcludedProperties.Contains(property.Name))
                 .ToArray();
 
-            var source = GenerateMetadata(type, properties);
+            string source = GenerateMetadata(type, properties);
 
             spc.AddSource(GetHintName(type), SourceText.From(source, Encoding.UTF8));
         });
 
-        // Generate the central control registry.
         context.RegisterSourceOutput(controls.Collect(), static (spc, types) =>
         {
-            var source = GenerateRegistry(types);
+            string source = GenerateRegistry(types);
 
             spc.AddSource("XamlControlRegistry.g.cs", SourceText.From(source, Encoding.UTF8));
         });
     }
 
+    // ------------------------------------------------------------
+    // Control discovery
+    // ------------------------------------------------------------
+
     private static bool IsSupportedControl(INamedTypeSymbol type)
     {
         return type.TypeKind == TypeKind.Class
             && !type.IsStatic
+            && !type.IsAbstract
             && !type.IsGenericType
-            && type.ContainingType is null;
+            && type.ContainingType is null
+            && HasAccessibleParameterlessConstructor(type);
+    }
+
+    private static bool HasAccessibleParameterlessConstructor(INamedTypeSymbol type)
+    {
+        return type.InstanceConstructors.Any(static constructor =>
+            constructor.Parameters.Length == 0 &&
+            (constructor.DeclaredAccessibility == Accessibility.Public ||
+             constructor.DeclaredAccessibility == Accessibility.Internal ||
+             constructor.DeclaredAccessibility == Accessibility.ProtectedOrInternal));
+    }
+
+    private static bool IsReadableProperty(IPropertySymbol property)
+    {
+        return !property.IsStatic
+            && !property.IsIndexer
+            && property.DeclaredAccessibility == Accessibility.Public
+            && property.GetMethod?.DeclaredAccessibility == Accessibility.Public;
     }
 
     private static string GetHintName(INamedTypeSymbol type)
     {
         string fullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        string safeName = new([.. fullName.Select(static c => char.IsLetterOrDigit(c) ? c : '_')]);
+        string safeName = new(fullName.Select(static c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
 
         return $"{safeName}.XamlMetadata.g.cs";
     }
@@ -82,11 +97,19 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
         return $"global::{ns}{type.Name}XamlMetadata";
     }
 
+    private static string GetTypeName(ITypeSymbol type)
+    {
+        return type.WithNullableAnnotation(NullableAnnotation.NotAnnotated).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    // ------------------------------------------------------------
+    // Property discovery
+    // ------------------------------------------------------------
+
     private static IEnumerable<IPropertySymbol> GetProperties(INamedTypeSymbol type)
     {
         var seen = new HashSet<string>();
 
-        // Derived properties take precedence over inherited properties.
         for (var current = type; current is not null; current = current.BaseType)
         {
             foreach (var property in current.GetMembers().OfType<IPropertySymbol>())
@@ -97,16 +120,73 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
         }
     }
 
+    private static bool IsWritableProperty(IPropertySymbol property)
+    {
+        return property.SetMethod?.DeclaredAccessibility == Accessibility.Public;
+    }
+
+    // ------------------------------------------------------------
+    // Content control detection
+    // ------------------------------------------------------------
+
+    private static bool IsContentControl(INamedTypeSymbol type)
+    {
+        for (var current = type; current is not null; current = current.BaseType)
+        {
+            if (current.ToDisplayString() == ContentSyntaxName)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static IPropertySymbol? GetContentProperty(INamedTypeSymbol type)
+    {
+        return GetProperties(type).FirstOrDefault(static property => property.Name == "Content");
+    }
+
+    // ------------------------------------------------------------
+    // Element names
+    // ------------------------------------------------------------
+
+    private static string GetElementName(INamedTypeSymbol type)
+    {
+        var attribute = type.GetAttributes()
+            .FirstOrDefault(static attribute => attribute.AttributeClass?.ToDisplayString() == AttributeName);
+
+        if (attribute is not null &&
+            attribute.ConstructorArguments.Length > 0 &&
+            attribute.ConstructorArguments[0].Value is string name &&
+            !string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        string result = type.Name;
+
+        if (result.EndsWith("Syntax", StringComparison.Ordinal))
+            result = result.Substring(0, result.Length - "Syntax".Length);
+
+        if (result.StartsWith("Xaml", StringComparison.Ordinal))
+            result = result.Substring("Xaml".Length);
+
+        return result;
+    }
+
+    // ------------------------------------------------------------
+    // Value serialization
+    // ------------------------------------------------------------
+
     private static string GenerateValueExpression(IPropertySymbol property)
     {
-        string typeName = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
         string propertyName = EscapeIdentifier(property.Name);
         string value = $"control.{propertyName}";
+        string typeName = GetTypeName(property.Type);
 
         return typeName switch
         {
             "global::XamlBlocksCompiler.Models.Color" => $"{value}.ToHex()",
+
             "global::XamlBlocksCompiler.Models.Alignment"
                 when property.Name == "VerticalAlignment" =>
                 $$"""
@@ -133,69 +213,23 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
                 })
                 """,
 
-            _ => $"global::System.Convert.ToString({value}, " + "global::System.Globalization.CultureInfo.InvariantCulture)"
+            _ => $"global::System.Convert.ToString({value}, global::System.Globalization.CultureInfo.InvariantCulture)"
         };
     }
 
-    private static string GenerateMetadata(INamedTypeSymbol type, IPropertySymbol[] properties)
+    private static bool IsNumericType(ITypeSymbol type)
     {
-        string ns = type.ContainingNamespace.IsGlobalNamespace ? "" : type.ContainingNamespace.ToDisplayString();
+        if (type is INamedTypeSymbol nullable && nullable.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
+            type = nullable.TypeArguments[0];
 
-        string namespaceDeclaration = string.IsNullOrEmpty(ns) ? "" : $"namespace {ns};";
-
-        string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-        string propertyNames = string.Join(
-            ",\n        ",
-            properties.Select(property => SymbolDisplay.FormatLiteral(property.Name, quote: true)));
-
-        string elementName = GetElementName(type);
-
-        string attributeWriters = string.Join(
-            "\n        ",
-            properties.Select(GenerateAttributeWriter));
-
-        return $$"""
-        // <auto-generated/>
-        #nullable enable
-
-        {{namespaceDeclaration}}
-
-        public static class {{type.Name}}XamlMetadata
-        {
-            public const string ElementName = {{SymbolDisplay.FormatLiteral(elementName, quote: true)}};
-
-            public static readonly string[] PropertyNames =
-            {
-                {{propertyNames}}
-            };
-
-            public static void WriteAttributes(global::System.Xml.XmlWriter writer, {{typeName}} control)
-            {
-                {{attributeWriters}}
-            }
-        }
-        """;
-    }
-
-    private static string GetElementName(INamedTypeSymbol type)
-    {
-        var attribute = type.GetAttributes()
-            .FirstOrDefault(attribute => attribute.AttributeClass?.ToDisplayString() == AttributeName);
-
-        if (attribute is not null &&
-            attribute.ConstructorArguments.Length > 0 &&
-            attribute.ConstructorArguments[0].Value is string name &&
-            !string.IsNullOrWhiteSpace(name))
-        {
-            return name;
-        }
-
-        const string suffix = "Syntax";
-
-        return type.Name.EndsWith(suffix, StringComparison.Ordinal)
-            ? type.Name.Substring(0, type.Name.Length - suffix.Length)
-            : type.Name;
+        return type.SpecialType is
+            SpecialType.System_Double or
+            SpecialType.System_Single or
+            SpecialType.System_Int32 or
+            SpecialType.System_Int64 or
+            SpecialType.System_Int16 or
+            SpecialType.System_Byte or
+            SpecialType.System_Decimal;
     }
 
     private static string GenerateAttributeWriter(IPropertySymbol property)
@@ -211,7 +245,11 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
                 var value = {{valueExpression}};
 
                 if (value is not null &&
-                    global::System.Double.TryParse(value, global::System.Globalization.NumberStyles.Float, global::System.Globalization.CultureInfo.InvariantCulture, out var number) &&
+                    global::System.Double.TryParse(
+                        value,
+                        global::System.Globalization.NumberStyles.Float,
+                        global::System.Globalization.CultureInfo.InvariantCulture,
+                        out var number) &&
                     !global::System.Double.IsNaN(number) &&
                     !global::System.Double.IsInfinity(number))
                 {
@@ -221,64 +259,256 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
             """;
         }
 
+        return $"writer.WriteAttributeString({propertyName}, {valueExpression});";
+    }
+
+    // ------------------------------------------------------------
+    // Attribute deserialization
+    // ------------------------------------------------------------
+
+    private static string? GenerateAttributeReader(IPropertySymbol property)
+    {
+        string name = SymbolDisplay.FormatLiteral(property.Name, true);
+        string identifier = EscapeIdentifier(property.Name);
+        string type = GetTypeName(property.Type);
+
+        string? assignment = type switch
+        {
+            "global::System.String" => $"control.{identifier} = value;",
+
+            "global::XamlBlocksCompiler.Models.Alignment"
+                when property.Name == "VerticalAlignment" =>
+                """
+                control.VerticalAlignment = value switch
+                {
+                    "Center" => global::XamlBlocksCompiler.Models.Alignment.Center,
+                    "Top" => global::XamlBlocksCompiler.Models.Alignment.Start,
+                    "Bottom" => global::XamlBlocksCompiler.Models.Alignment.End,
+                    "Stretch" => global::XamlBlocksCompiler.Models.Alignment.Stretch,
+                    _ => throw new global::System.FormatException(
+                        $"Invalid VerticalAlignment: {value}")
+                };
+                """,
+
+            "global::XamlBlocksCompiler.Models.Alignment"
+                when property.Name == "HorizontalAlignment" =>
+                """
+                control.HorizontalAlignment = value switch
+                {
+                    "Center" => global::XamlBlocksCompiler.Models.Alignment.Center,
+                    "Left" => global::XamlBlocksCompiler.Models.Alignment.Start,
+                    "Right" => global::XamlBlocksCompiler.Models.Alignment.End,
+                    "Stretch" => global::XamlBlocksCompiler.Models.Alignment.Stretch,
+                    _ => throw new global::System.FormatException(
+                        $"Invalid HorizontalAlignment: {value}")
+                };
+                """,
+
+            "global::XamlBlocksCompiler.Models.Color" =>
+                $"control.{identifier} = global::XamlBlocksCompiler.Models.Color.FromHex(value);",
+
+            _ when property.Type.SpecialType == SpecialType.System_Double =>
+                $"control.{identifier} = double.Parse(value, global::System.Globalization.CultureInfo.InvariantCulture);",
+
+            _ when property.Type.SpecialType == SpecialType.System_Single =>
+                $"control.{identifier} = float.Parse(value, global::System.Globalization.CultureInfo.InvariantCulture);",
+
+            _ when property.Type.SpecialType == SpecialType.System_Int32 =>
+                $"control.{identifier} = int.Parse(value, global::System.Globalization.CultureInfo.InvariantCulture);",
+
+            _ when property.Type.SpecialType == SpecialType.System_Int64 =>
+                $"control.{identifier} = long.Parse(value, global::System.Globalization.CultureInfo.InvariantCulture);",
+
+            _ when property.Type.SpecialType == SpecialType.System_Boolean => $"control.{identifier} = bool.Parse(value);",
+
+            _ => null
+        };
+
+        if (assignment is null)
+            return null;
+
         return $$"""
-        writer.WriteAttributeString({{propertyName}}, {{valueExpression}});
+        case {{name}}:
+            {{assignment}}
+            return true;
         """;
     }
 
-    private static bool IsNumericType(ITypeSymbol type)
-    {
-        // Support nullable numeric properties as well.
-        if (type is INamedTypeSymbol nullable && nullable.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T)
-            type = nullable.TypeArguments[0];
+    // ------------------------------------------------------------
+    // Content deserialization
+    // ------------------------------------------------------------
 
-        return type.SpecialType is
-            SpecialType.System_Double or
-            SpecialType.System_Single or
-            SpecialType.System_Int32 or
-            SpecialType.System_Int64 or
-            SpecialType.System_Int16 or
-            SpecialType.System_Byte or
-            SpecialType.System_Decimal;
+    private static string GenerateContentReader(INamedTypeSymbol type, IPropertySymbol contentProperty)
+    {
+        string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        string propertyName = EscapeIdentifier(contentProperty.Name);
+
+        return $$"""
+            public static bool ReadContent({{typeName}} control, object? content)
+            {
+                control.{{propertyName}} = content;
+                return true;
+            }
+            """;
     }
 
-    private static string EscapeIdentifier(string identifier)
+    // ------------------------------------------------------------
+    // Metadata generation
+    // ------------------------------------------------------------
+
+    private static string GenerateMetadata(INamedTypeSymbol type, IPropertySymbol[] properties)
     {
-        return SyntaxFacts.GetKeywordKind(identifier) != SyntaxKind.None ? "@" + identifier : identifier;
+        string ns = type.ContainingNamespace.IsGlobalNamespace ? "" : type.ContainingNamespace.ToDisplayString();
+
+        string namespaceDeclaration = string.IsNullOrEmpty(ns) ? "" : $"namespace {ns};";
+
+        string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        // Content remains discoverable in PropertyNames.
+        string propertyNames = string.Join(",\n        ", properties.Select(property => SymbolDisplay.FormatLiteral(property.Name, true)));
+
+        // Content is not an XML attribute.
+        var attributeProperties = properties.Where(static property => property.Name != "Content").ToArray();
+
+        string attributeWriters = string.Join("\n        ", attributeProperties.Select(GenerateAttributeWriter));
+
+        var writableProperties = attributeProperties
+            .Where(IsWritableProperty)
+            .Select(GenerateAttributeReader)
+            .Where(static reader => reader is not null)
+            .ToArray();
+
+        string attributeReaders = string.Join("\n", writableProperties);
+
+        string contentReader = "";
+
+        if (IsContentControl(type))
+        {
+            var contentProperty = GetContentProperty(type);
+
+            if (contentProperty is not null && IsWritableProperty(contentProperty))
+                contentReader = GenerateContentReader(type, contentProperty);
+        }
+
+        return $$"""
+        // <auto-generated/>
+        #nullable enable
+
+        {{namespaceDeclaration}}
+
+        public static class {{type.Name}}XamlMetadata
+        {
+            public const string ElementName = {{SymbolDisplay.FormatLiteral(GetElementName(type), true)}};
+
+            public static readonly string[] PropertyNames =
+            {
+                {{propertyNames}}
+            };
+
+            public static void WriteAttributes(global::System.Xml.XmlWriter writer, {{typeName}} control)
+            {
+                {{attributeWriters}}
+            }
+
+            public static bool ReadAttribute({{typeName}} control, string name, string value)
+            {
+                switch (name)
+                {
+                    {{attributeReaders}}
+
+                    default:
+                        return false;
+                }
+            }
+
+            {{contentReader}}
+        }
+        """;
     }
+
+    // ------------------------------------------------------------
+    // Registry generation
+    // ------------------------------------------------------------
 
     private static string GenerateRegistry(ImmutableArray<INamedTypeSymbol> types)
     {
-        // Derived controls must appear before their base controls.
         var orderedTypes = types
             .OrderByDescending(GetInheritanceDepth)
             .ThenBy(static type => type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), StringComparer.Ordinal)
             .ToArray();
 
-        string elementNameCases = string.Join("\n",
+        string elementNameCases = string.Join(
+            "\n",
             orderedTypes.Select(type =>
             {
                 string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-                string metadataName = GetMetadataTypeName(type);
+                string metadata = GetMetadataTypeName(type);
 
-                return $"{typeName} => {metadataName}.ElementName,";
+                return $"{typeName} => {metadata}.ElementName,";
             }));
 
-        string attributeCases = string.Join(
+        string writerCases = string.Join(
             "\n",
             orderedTypes.Select(type =>
             {
-                string typeName = type.ToDisplayString(
-                    SymbolDisplayFormat.FullyQualifiedFormat);
+                string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-                string metadataName = GetMetadataTypeName(type);
+                string metadata = GetMetadataTypeName(type);
 
                 return $$"""
-                    case {{typeName}} control:
-                        {{metadataName}}.WriteAttributes(writer, control);
-                        return true;
-                    """;
+                case {{typeName}} control:
+                    {{metadata}}.WriteAttributes(writer, control);
+                    return true;
+                """;
+            }));
+
+        string readerCases = string.Join(
+            "\n",
+            orderedTypes.Select(type =>
+            {
+                string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                string metadata = GetMetadataTypeName(type);
+
+                return $$"""
+                case {{typeName}} control:
+                    return {{metadata}}.ReadAttribute(control, name, value);
+                """;
+            }));
+
+        var contentTypes = orderedTypes
+            .Where(IsContentControl)
+            .Where(type =>
+            {
+                var property = GetContentProperty(type);
+                return property is not null && IsWritableProperty(property);
+            })
+            .ToArray();
+
+        string contentCases = string.Join(
+            "\n",
+            contentTypes.Select(type =>
+            {
+                string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                string metadata = GetMetadataTypeName(type);
+
+                return $$"""
+                case {{typeName}} control:
+                    return {{metadata}}.ReadContent(control, content);
+                """;
+            }));
+
+        string factoryCases = string.Join(
+            "\n",
+            orderedTypes.Select(type =>
+            {
+                string metadata = GetMetadataTypeName(type);
+                string typeName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                return $"{metadata}.ElementName => new {typeName}(),";
             }));
 
         return $$"""
@@ -303,15 +533,51 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
             {
                 switch (element)
                 {
-                    {{attributeCases}}
+                    {{writerCases}}
 
                     default:
                         return false;
                 }
             }
+
+            public static bool ReadAttribute(global::XamlBlocksCompiler.Syntax.XamlElementSyntax element, string name, string value)
+            {
+                switch (element)
+                {
+                    {{readerCases}}
+
+                    default:
+                        return false;
+                }
+            }
+
+            public static bool ReadContent(global::XamlBlocksCompiler.Syntax.XamlElementSyntax element, object? content)
+            {
+                switch (element)
+                {
+                    {{contentCases}}
+
+                    default:
+                        return false;
+                }
+            }
+
+            public static global::XamlBlocksCompiler.Syntax.XamlElementSyntax? CreateElement(string name)
+            {
+                return name switch
+                {
+                    {{factoryCases}}
+
+                    _ => null
+                };
+            }
         }
         """;
     }
+
+    // ------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------
 
     private static int GetInheritanceDepth(INamedTypeSymbol type)
     {
@@ -321,5 +587,10 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
             depth++;
 
         return depth;
+    }
+
+    private static string EscapeIdentifier(string identifier)
+    {
+        return SyntaxFacts.GetKeywordKind(identifier) != SyntaxKind.None ? "@" + identifier : identifier;
     }
 }
