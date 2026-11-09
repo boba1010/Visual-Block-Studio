@@ -1,12 +1,12 @@
-# Visual Block Studio 2G
+# Visual Block Studio Gen 2
 
 **A dedicated visual designer for XAML.**
 
-Visual Block Studio 2G (VBS 2G) is a Windows desktop application designed to make creating and editing XAML interfaces more visual and accessible.
+Visual Block Studio Gen 2 (VBS Gen2) is a Windows desktop application designed to make creating and editing XAML interfaces more visual and accessible.
 
 Instead of manually writing every layout element and property, developers can build interfaces using a visual design surface, configure controls through a property inspector, preview their work, and generate clean XAML ready to use in Visual Studio.
 
-VBS 2G is designed to complement existing development tools rather than replace them.
+VBS Gen2 is designed to complement existing development tools rather than replace them.
 
 ## Features
 
@@ -35,13 +35,13 @@ VBS 2G is designed to complement existing development tools rather than replace 
 - Copy generated XAML directly to the system clipboard.
 
 ### Source Generation
-VBS 2G uses Roslyn source generation to automate control metadata registration.
+VBS Gen2 uses Roslyn source generation to automate control metadata registration.
 
 Controls marked with the appropriate metadata attribute can participate in the generated serialization system without requiring manual registration in the main XAML generator.
 
 ## Architecture
 
-VBS 2G uses a syntax-based architecture to separate the visual representation from the generated XAML.
+VBS Gen2 uses a syntax-based architecture to separate the visual representation from the generated XAML.
 
 ```text
        Existing XAML
@@ -85,7 +85,7 @@ The internal syntax tree acts as the source of truth for the designer. Visual co
 
 ## Intended Workflow
 
-VBS 2G is designed around a simple workflow:
+VBS Gen2 is designed around a simple workflow:
 
 1. Open an existing XAML document or start a new design.
 2. Add and configure controls visually.
@@ -100,7 +100,7 @@ It focuses on one job: **visual XAML editing.**
 
 ## Development Status
 
-VBS 2G is currently under development.
+VBS Gen2 is currently under development.
 
 | Feature | Status |
 |---|---|
@@ -212,8 +212,8 @@ Examples:
 
 ## Philosophy
 
-VBS 2G isn't intended to compete with Visual Studio.
+VBS Gen2 isn't intended to compete with Visual Studio.
 
-Visual Studio already provides a complete development environment. VBS 2G instead focuses on improving one particular part of that workflow: designing XAML interfaces.
+Visual Studio already provides a complete development environment. VBS Gen2 instead focuses on improving one particular part of that workflow: designing XAML interfaces.
 
 **Design visually. Generate XAML. Continue developing in Visual Studio.**
