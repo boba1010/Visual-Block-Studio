@@ -69,7 +69,7 @@ public sealed class XamlDesignerDocument
         _syntaxByElement.Remove(element);
         _elements.Remove(element);
 
-        DocumentChanged?.Invoke(this, new(ChangeType.Remove, syntax, element));
+        DocumentChanged?.Invoke(this, new(ChangeType.Remove, syntax, element)); 
     }
 
     private static bool DetachSyntaxNode(XamlPanelSyntax parent, XamlElementSyntax target)
