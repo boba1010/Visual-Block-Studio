@@ -8,6 +8,12 @@
     <Page.KeyboardAccelerators>
         <KeyboardAccelerator Key="Delete" Invoked="Delete_Invoked" />
         <KeyboardAccelerator Key="Escape" Invoked="Escape_Invoked" />
+        <!-- 
+        <KeyboardAccelerator Key="Y" Modifiers="Control" Invoked="Redo_Invoked" />
+        <KeyboardAccelerator Key="Z" Modifiers="Control" Invoked="Undo_Invoked" /> 
+        -->
+        <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="Save_Invoked" />
+        <KeyboardAccelerator Key="S" Modifiers="Control,Shift" Invoked="GenerateXaml_Invoked" />
     </Page.KeyboardAccelerators>
     
     <Grid Background="#FF202020" Padding="10" ColumnSpacing="10" RowSpacing="5">
@@ -56,17 +62,11 @@
                 FontWeight="SemiBold"
                 HorizontalAlignment="Center" />
 
-            <Button 
-                Content="Button"
-                Click="AddButton_Click" />
+            <Button Content="Button" Click="AddButton_Click" />
 
-            <Button 
-                Content="TextBlock"
-                Click="AddTextBlock_Click" />
+            <Button Content="TextBlock" Click="AddTextBlock_Click" />
 
-            <Button
-                Content="Grid"
-                Click="AddGrid_Click" />
+            <Button Content="Grid" Click="AddGrid_Click" />
         </StackPanel>
 
         <ScrollViewer
@@ -83,19 +83,13 @@
                 Background="#FF303030">
 
                 <!-- Native control previews -->
-                <Grid
-                    x:Name="PreviewSurface"
-                    IsHitTestVisible="False"/>
+                <Grid x:Name="PreviewSurface" IsHitTestVisible="False"/>
 
                 <!-- Designer input -->
-                <Canvas
-                    x:Name="DesignSurface"
-                    Background="Transparent" />
+                <Canvas x:Name="DesignSurface" Background="Transparent" />
 
                 <!-- Selection outline -->
-                <Canvas
-                    x:Name="SelectionOverlay"
-                    IsHitTestVisible="False" />
+                <Canvas x:Name="SelectionOverlay" IsHitTestVisible="False" />
             </Grid>
         </ScrollViewer>
 
@@ -109,18 +103,14 @@
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
 
-            <TextBlock
-                Grid.Row="0" FontSize="20" Text="Properties"
-                HorizontalAlignment="Center" />
+            <TextBlock Grid.Row="0" FontSize="20" Text="Properties" HorizontalAlignment="Center" />
 
             <ScrollViewer
                 Grid.Row="1"
                 VerticalScrollBarVisibility="Visible"
                 HorizontalScrollBarVisibility="Disabled">
 
-                <StackPanel
-                    x:Name="PropertiesContainer"
-                    Spacing="12" />
+                <StackPanel x:Name="PropertiesContainer" Spacing="12" />
             </ScrollViewer>
         </Grid>
     </Grid>

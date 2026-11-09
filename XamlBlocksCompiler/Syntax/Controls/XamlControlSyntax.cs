@@ -9,4 +9,6 @@ public abstract class XamlControlSyntax(string name) : XamlElementSyntax(name)
 
     public Alignment VerticalAlignment { get; set; } = Alignment.Center;
     public Alignment HorizontalAlignment { get; set; } = Alignment.Center;
+
+    public XamlControlSyntax? Parent { get; set; }
 }

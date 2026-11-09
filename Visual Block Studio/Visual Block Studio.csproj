@@ -20,8 +20,6 @@
   <ItemGroup>
     <None Remove="Views\Controls\Badge.xaml" />
     <None Remove="Views\Controls\CreateFileDialog.xaml" />
-    <None Remove="Views\Controls\FilePickerDialog.xaml" />
-    <None Remove="Views\Controls\FolderPickerDialog.xaml" />
     <None Remove="Views\Controls\OpenFileDialog.xaml" />
     <None Remove="Views\Dashboard\DashboardPage.xaml" />
     <None Remove="Views\XamlVisualEditor.xaml" />

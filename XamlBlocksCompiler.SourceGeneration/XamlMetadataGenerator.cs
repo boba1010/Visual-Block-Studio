@@ -19,7 +19,8 @@ public sealed class XamlMetadataGenerator : IIncrementalGenerator
         "Namespaces",
         "Attributes",
         "Name",
-        "Children"
+        "Children",
+        "Parent"
     ];
 
     public void Initialize(IncrementalGeneratorInitializationContext context)

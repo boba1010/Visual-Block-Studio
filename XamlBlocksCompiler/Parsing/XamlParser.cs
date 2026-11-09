@@ -51,7 +51,7 @@ public static class XamlParser
                     if (childElement.Name.LocalName.Contains('.'))
                         throw new NotSupportedException("Property elements are not supported yet.");
 
-                    panel.Children.Add(ParseElement(childElement));
+                    panel.Children.Add((XamlControlSyntax)ParseElement(childElement));
                 }
                 break;
 
