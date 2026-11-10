@@ -8,7 +8,6 @@ using Visual_Block_Studio.Services;
 using Windows.ApplicationModel.DataTransfer;
 using XamlBlocksCompiler.Generation;
 using XamlBlocksCompiler.Parsing;
-using XamlBlocksCompiler.Syntax;
 using XamlBlocksCompiler.Syntax.Controls;
 using XamlPreviewer;
 
@@ -127,6 +126,11 @@ public sealed partial class XamlVisualEditor : Page
                 return false;
             }
         });
+
+        Unloaded += (s, e) =>
+        {
+            WeakReferenceMessenger.Default.UnregisterAll(this);
+        };
     }
 
     private void SaveChangesIfExists()

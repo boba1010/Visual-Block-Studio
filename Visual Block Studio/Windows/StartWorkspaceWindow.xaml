@@ -3,7 +3,8 @@
     x:Class="Visual_Block_Studio.Windows.StartWorkspaceWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Visual_Block_Studio.Windows">
+    xmlns:local="using:Visual_Block_Studio.Windows"
+    Title="Visual Block Studio">
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
